@@ -1,0 +1,19 @@
+# Directories
+.vs/
+bin-x64/
+bin-int-x64/
+
+#VIGames/sfml-graphics-d.dll
+#VIGames/sfml-graphics-d-2.dll
+#VIGames/sfml-graphics-2.dll
+#VIGames/sfml-audio-d-2.dll
+#VIGames/sfml-audio-2.dll
+#VIGames/sfml-network-d-2.dll
+#VIGames/sfml-network-2.dll
+#VIGames/sfml-system-d-2.dll
+#VIGames/sfml-system-2.dll
+#VIGames/sfml-window-d-2.dll
+#VIGames/sfml-window-2.dll
+#VIGames/openal32.dll
+
+VIGames/.gitignore
