@@ -2,7 +2,7 @@
 
 #include "Engine/Layer.h"
 #include "Player.h"
-
+#include "Engine/Camera/OrthographicCamera.h"
 namespace Engine {
 
 	class GameLayer : public Layer
@@ -17,6 +17,7 @@ namespace Engine {
 		
 	private:
 		Player* m_Player;
+		sf::View m_View;
 	};
 
 }

@@ -13,6 +13,8 @@ namespace Engine {
 
 		m_Player->SetSpriteScale(0.1f, 0.1f);
 		m_Player->SetPosition(100.0f, 100.0f);
+
+		
 	}
 
 	GameLayer::~GameLayer()
@@ -33,6 +35,7 @@ namespace Engine {
 
 	void GameLayer::OnUpdate(float& ts)
 	{
+		
 	}
 
 	void GameLayer::Render(sf::RenderTarget& rt)

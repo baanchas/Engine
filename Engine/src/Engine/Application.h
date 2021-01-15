@@ -2,8 +2,11 @@
 
 #include "Engine/Graphics/window.h"
 #include "Engine/LayerStack.h"
+
 #include "Game/Menu.h"
 #include "Game/GameLayer.h"
+
+#include "Engine/Camera/OrthographicCamera.h"
 
 #include "imgui.h"
 #include "imgui-sfml.h"
@@ -12,6 +15,7 @@ namespace Engine {
 
 	class Application
 	{
+
 	public:
 		Application();
 		~Application() { delete window; };
@@ -26,11 +30,12 @@ namespace Engine {
 		void PushLayer(Layer* layer);
 		void PopLayer(Layer* layer);
 
-		void UpdateTimestep() { m_Timestep = clock.restart().asSeconds(); }
+		static inline sf::RenderWindow* GetWindow() { return window->m_Window; }
 
+		void UpdateTimestep() { m_Timestep = clock.restart().asSeconds(); }
 	public:
-		Window* window;
-		char windowTitle[255] = "ImGui + SFML = <3";
+		static Window* window;
+
 	private:
 		sf::Color bgColor;
 		LayerStack m_LayerStack;
@@ -38,7 +43,12 @@ namespace Engine {
 		float color[3] = { 0.f, 0.f, 0.f };
 		float m_Timestep;
 
+		//sf::View _Camera;
+		OrthographicCamera m_Camera;
+
 		sf::Event m_Event;
 		sf::Clock clock;
 	};
+
+	//Application* CreateApplication();
 }

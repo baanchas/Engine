@@ -3,6 +3,8 @@
 
 namespace Engine {
 
+	Window* Application::window;
+
 	Application::Application()
 	{
 		init();
@@ -13,8 +15,13 @@ namespace Engine {
 	void Application::init()
 	{
 		window = new Window();
+
 		ImGui::SFML::Init(*window->m_Window);
 		Log::InitLog();
+
+		m_Camera.m_View.setSize(window->GetWidth(), window->GetHeight());
+		window->m_Window->setView(m_Camera.m_View);
+
 	}
 
 	void Application::Run()
@@ -40,23 +47,59 @@ namespace Engine {
 
 			if (m_LayerStack.GetSize() != 0)
 				m_LayerStack.top()->OnEvent(event);
+
+			if (event.type == sf::Event::MouseWheelMoved)
+			{
+				if (event.mouseWheel.delta == 1)
+				{
+					m_Camera.Zoom(0.95f);
+				}
+				else if (event.mouseWheel.delta == -1)
+				{
+					m_Camera.Zoom(1.05f);
+				}
+			}
+
 		}
 	}
 
 	void Application::OnUpdate()
 	{
 		ImGui::SFML::Update(*window->m_Window, clock.restart());
-		
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+			m_Camera.Move(-m_Camera.speed, 0.0f);
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+			m_Camera.Move(+m_Camera.speed, 0.0f);
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+			m_Camera.Move(0.0f, -m_Camera.speed);
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+			m_Camera.Move(0.0f, +m_Camera.speed);
+
+
 		if (m_LayerStack.GetSize() != 0)
 			m_LayerStack.top()->OnUpdate(m_Timestep);
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			m_Camera.Move(sf::Vector2f(1.0f, 1.0f));
+			ENGINE_INFO("Camera center is {0}, {1}", m_Camera.m_View.getCenter().x, m_Camera.m_View.getCenter().y);
+		}
+
 	}
 
 	void Application::Render()
 	{
+		window->m_Window->setView(m_Camera.m_View);
+
 		window->m_Window->clear();
 
 		if (m_LayerStack.GetSize() != 0)
 			m_LayerStack.top()->Render(*window->m_Window);
+
+		ImGui::Begin("Sample window");
+		ImGui::End();
 
 		ImGui::SFML::Render(*window->m_Window);
 

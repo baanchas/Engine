@@ -3,9 +3,10 @@
 
 int main()
 {
-	Engine::Application game;
+	Engine::Application app;
 
-	game.Run();
+	app.Run();
+
 	//std::cin.get();
 	return 0;
 }

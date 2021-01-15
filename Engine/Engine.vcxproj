@@ -101,8 +101,10 @@
     <ClCompile Include="lib\imgui\imgui_draw.cpp" />
     <ClCompile Include="lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Engine\Camera\OrthographicCamera.cpp" />
     <ClCompile Include="src\Engine\Objects\Entity.cpp" />
     <ClCompile Include="src\Engine\Objects\EntityDrawable.cpp" />
+    <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\enpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -118,9 +120,11 @@
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\Application.h" />
+    <ClInclude Include="src\Engine\Camera\OrthographicCamera.h" />
     <ClInclude Include="src\Engine\Input\KeyCodes.h" />
     <ClInclude Include="src\Engine\Objects\Entity.h" />
     <ClInclude Include="src\Engine\Objects\EntityDrawable.h" />
+    <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\enpch.h" />
     <ClInclude Include="src\Engine\Graphics\window.h" />
     <ClInclude Include="src\Engine\LayerStack.h" />
