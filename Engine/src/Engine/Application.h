@@ -5,6 +5,9 @@
 #include "Game/Menu.h"
 #include "Game/GameLayer.h"
 
+#include "imgui.h"
+#include "imgui-sfml.h"
+
 namespace Engine {
 
 	class Application
@@ -27,10 +30,14 @@ namespace Engine {
 
 	public:
 		Window* window;
-
+		char windowTitle[255] = "ImGui + SFML = <3";
 	private:
+		sf::Color bgColor;
 		LayerStack m_LayerStack;
+
+		float color[3] = { 0.f, 0.f, 0.f };
 		float m_Timestep;
+
 		sf::Event m_Event;
 		sf::Clock clock;
 	};

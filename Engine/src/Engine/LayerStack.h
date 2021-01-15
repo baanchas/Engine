@@ -17,6 +17,7 @@ namespace Engine {
 		void PopOverlay(Layer* overlay);
 
 		inline Layer* top() { return m_Layers.back(); }
+		inline int GetSize() const { return m_Layers.size(); }
 
 		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
 		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
