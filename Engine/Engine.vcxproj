@@ -101,7 +101,8 @@
     <ClCompile Include="lib\imgui\imgui_draw.cpp" />
     <ClCompile Include="lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Engine\Camera\OrthographicCamera.cpp" />
+    <ClCompile Include="src\Engine\Components\OrthographicCameraComponent.cpp" />
+    <ClCompile Include="src\Engine\ImGuiLayer.cpp" />
     <ClCompile Include="src\Engine\Objects\Entity.cpp" />
     <ClCompile Include="src\Engine\Objects\EntityDrawable.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
@@ -112,7 +113,7 @@
     <ClCompile Include="src\Engine\Layer.cpp" />
     <ClCompile Include="src\Engine\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Application.cpp" />
-    <ClCompile Include="src\Game\GameLayer.cpp" />
+    <ClCompile Include="src\Engine\EditorLayer.cpp" />
     <ClCompile Include="src\Game\Menu.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -120,7 +121,8 @@
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\Application.h" />
-    <ClInclude Include="src\Engine\Camera\OrthographicCamera.h" />
+    <ClInclude Include="src\Engine\Components\OrthographicCameraComponent.h" />
+    <ClInclude Include="src\Engine\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Input\KeyCodes.h" />
     <ClInclude Include="src\Engine\Objects\Entity.h" />
     <ClInclude Include="src\Engine\Objects\EntityDrawable.h" />
@@ -130,7 +132,7 @@
     <ClInclude Include="src\Engine\LayerStack.h" />
     <ClInclude Include="src\Engine\Layer.h" />
     <ClInclude Include="src\Engine\Log.h" />
-    <ClInclude Include="src\Game\GameLayer.h" />
+    <ClInclude Include="src\Engine\EditorLayer.h" />
     <ClInclude Include="src\Game\Menu.h" />
     <ClInclude Include="src\Game\Player.h" />
   </ItemGroup>

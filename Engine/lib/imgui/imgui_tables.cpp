@@ -337,7 +337,7 @@ bool    ImGui::BeginTableEx(const char* name, ImGuiID id, int columns_count, ImG
     table->ColumnsCount = columns_count;
     table->IsLayoutLocked = false;
     table->InnerWidth = inner_width;
-    table->IsOuterRectAutoFitX = (outer_size.x == 0.0f) && (use_child_window == false);
+    table->IsOuterRectMinFitX = (outer_size.x == 0.0f) && (use_child_window == false); // Will be set to false later if there are any Stretch column.
 
     // When not using a child window, WorkRect.Max will grow as we append contents.
     if (use_child_window)
@@ -841,7 +841,7 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
     }
     table->ColumnsEnabledFixedCount = (ImGuiTableColumnIdx)count_fixed;
 
-    // [Part 5] Apply final widths based on requested widths
+    // [Part 4] Apply final widths based on requested widths
     const ImRect work_rect = table->WorkRect;
     const float width_spacings = (table->OuterPaddingX * 2.0f) + (table->CellSpacingX1 + table->CellSpacingX2) * (table->ColumnsEnabledCount - 1);
     const float width_avail = ((table->Flags & ImGuiTableFlags_ScrollX) && table->InnerWidth == 0.0f) ? table->InnerClipRect.GetWidth() : work_rect.GetWidth();
@@ -872,7 +872,7 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
         table->ColumnsGivenWidth += column->WidthGiven;
     }
 
-    // [Part 6] Redistribute stretch remainder width due to rounding (remainder width is < 1.0f * number of Stretch column).
+    // [Part 5] Redistribute stretch remainder width due to rounding (remainder width is < 1.0f * number of Stretch column).
     // Using right-to-left distribution (more likely to match resizing cursor).
     if (width_remaining_for_stretched_columns >= 1.0f && !(table->Flags & ImGuiTableFlags_PreciseWidths))
         for (int order_n = table->ColumnsCount - 1; stretch_sum_weights > 0.0f && width_remaining_for_stretched_columns >= 1.0f && order_n >= 0; order_n--)
@@ -892,7 +892,7 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
     const ImRect mouse_hit_rect(table->OuterRect.Min.x, table->OuterRect.Min.y, table->OuterRect.Max.x, ImMax(table->OuterRect.Max.y, table->OuterRect.Min.y + table->LastOuterHeight));
     const bool is_hovering_table = ItemHoverable(mouse_hit_rect, 0);
 
-    // [Part 7] Setup final position, offset, skip/clip states and clipping rectangles, detect hovered column
+    // [Part 6] Setup final position, offset, skip/clip states and clipping rectangles, detect hovered column
     // Process columns in their visible orders as we are comparing the visible order and adjusting host_clip_rect while looping.
     int visible_n = 0;
     bool offset_x_frozen = (table->FreezeColumnsCount > 0);
@@ -1012,13 +1012,13 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
         }
 
         if (visible_n < table->FreezeColumnsCount)
-            host_clip_rect.Min.x = ImMax(host_clip_rect.Min.x, column->MaxX + TABLE_BORDER_SIZE);
+            host_clip_rect.Min.x = ImClamp(column->MaxX + TABLE_BORDER_SIZE, host_clip_rect.Min.x, host_clip_rect.Max.x);
 
         offset_x += column->WidthGiven + table->CellSpacingX1 + table->CellSpacingX2 + table->CellPaddingX * 2.0f;
         visible_n++;
     }
 
-    // [Part 8] Detect/store when we are hovering the unused space after the right-most column (so e.g. context menus can react on it)
+    // [Part 7] Detect/store when we are hovering the unused space after the right-most column (so e.g. context menus can react on it)
     // Clear Resizable flag if none of our column are actually resizable (either via an explicit _NoResize flag, either
     // because of using _WidthAuto/_WidthStretch). This will hide the resizing option from the context menu.
     const float unused_x1 = ImMax(table->WorkRect.Min.x, table->Columns[table->RightMostEnabledColumn].ClipRect.Max.x);
@@ -1030,12 +1030,12 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
     if (has_resizable == false && (table->Flags & ImGuiTableFlags_Resizable))
         table->Flags &= ~ImGuiTableFlags_Resizable;
 
-    // [Part 9] Lock actual OuterRect/WorkRect right-most position.
+    // [Part 8] Lock actual OuterRect/WorkRect right-most position.
     // This is done late to handle the case of fixed-columns tables not claiming more widths that they need.
     // Because of this we are careful with uses of WorkRect and InnerClipRect before this point.
     if (table->RightMostStretchedColumn != -1)
-        table->IsOuterRectAutoFitX = false;
-    if (table->IsOuterRectAutoFitX)
+        table->IsOuterRectMinFitX = false;
+    if (table->IsOuterRectMinFitX)
     {
         table->OuterRect.Max.x = table->WorkRect.Max.x = unused_x1;
         table->InnerClipRect.Max.x = ImMin(table->InnerClipRect.Max.x, unused_x1);
@@ -1044,17 +1044,17 @@ void ImGui::TableUpdateLayout(ImGuiTable* table)
     table->BorderX1 = table->InnerClipRect.Min.x;// +((table->Flags & ImGuiTableFlags_BordersOuter) ? 0.0f : -1.0f);
     table->BorderX2 = table->InnerClipRect.Max.x;// +((table->Flags & ImGuiTableFlags_BordersOuter) ? 0.0f : +1.0f);
 
-    // [Part 10] Allocate draw channels and setup background cliprect
+    // [Part 9] Allocate draw channels and setup background cliprect
     TableSetupDrawChannels(table);
 
-    // [Part 11] Hit testing on borders
+    // [Part 10] Hit testing on borders
     if (table->Flags & ImGuiTableFlags_Resizable)
         TableUpdateBorders(table);
     table->LastFirstRowHeight = 0.0f;
     table->IsLayoutLocked = true;
     table->IsUsingHeaders = false;
 
-    // [Part 12] Context menu
+    // [Part 11] Context menu
     if (table->IsContextPopupOpen && table->InstanceCurrent == table->InstanceInteracted)
     {
         const ImGuiID context_menu_id = ImHashStr("##ContextMenu", 0, table->ID);
@@ -1180,21 +1180,30 @@ void    ImGui::EndTable()
     inner_window->DC.PrevLineSize = table->HostBackupPrevLineSize;
     inner_window->DC.CurrLineSize = table->HostBackupCurrLineSize;
     inner_window->DC.CursorMaxPos = table->HostBackupCursorMaxPos;
-
+    const float inner_content_max_y = table->RowPosY2;
+    IM_ASSERT(table->RowPosY2 == inner_window->DC.CursorPos.y);
     if (inner_window != outer_window)
-    {
-        // Both OuterRect/InnerRect are valid from BeginTable
-        inner_window->DC.CursorMaxPos.y = table->RowPosY2;
-    }
+        inner_window->DC.CursorMaxPos.y = inner_content_max_y;
     else if (!(flags & ImGuiTableFlags_NoHostExtendY))
-    {
-        table->OuterRect.Max.y = table->InnerRect.Max.y = ImMax(table->OuterRect.Max.y, inner_window->DC.CursorPos.y); // Patch OuterRect/InnerRect height
-        outer_window->DC.CursorMaxPos.y = table->RowPosY2;
-    }
-
+        table->OuterRect.Max.y = table->InnerRect.Max.y = ImMax(table->OuterRect.Max.y, inner_content_max_y); // Patch OuterRect/InnerRect height
     table->WorkRect.Max.y = ImMax(table->WorkRect.Max.y, table->OuterRect.Max.y);
     table->LastOuterHeight = table->OuterRect.GetHeight();
 
+    // Setup inner scrolling range
+    // FIXME: This ideally should be done earlier, in BeginTable() SetNextWindowContentSize call, just like writing to inner_window->DC.CursorMaxPos.y,
+    // but since the later is likely to be impossible to do we'd rather update both axises together.
+    if (table->Flags & ImGuiTableFlags_ScrollX)
+    {
+        const float outer_padding_for_border = (table->Flags & ImGuiTableFlags_BordersOuterV) ? TABLE_BORDER_SIZE : 0.0f;
+        float max_pos_x = table->InnerWindow->DC.CursorMaxPos.x;
+        if (table->RightMostEnabledColumn != -1)
+            max_pos_x = ImMax(max_pos_x, table->Columns[table->RightMostEnabledColumn].WorkMaxX + table->CellPaddingX + table->OuterPaddingX - outer_padding_for_border);
+        if (table->ResizedColumn != -1)
+            max_pos_x = ImMax(max_pos_x, table->ResizeLockMinContentsX2);
+        table->InnerWindow->DC.CursorMaxPos.x = max_pos_x;
+    }
+
+    // Pop clipping rect
     if (!(flags & ImGuiTableFlags_NoClip))
         inner_window->DrawList->PopClipRect();
     inner_window->ClipRect = inner_window->DrawList->_ClipRectStack.back();
@@ -1227,7 +1236,13 @@ void    ImGui::EndTable()
     table->ColumnsAutoFitWidth = width_spacings + (table->CellPaddingX * 2.0f) * table->ColumnsEnabledCount;
     for (int column_n = 0; column_n < table->ColumnsCount; column_n++)
         if (table->EnabledMaskByIndex & ((ImU64)1 << column_n))
-            table->ColumnsAutoFitWidth += TableGetColumnWidthAuto(table, &table->Columns[column_n]);
+        {
+            ImGuiTableColumn* column = &table->Columns[column_n];
+            if ((column->Flags & ImGuiTableColumnFlags_WidthFixed) && !(column->Flags & ImGuiTableColumnFlags_NoResize))
+                table->ColumnsAutoFitWidth += column->WidthRequest;
+            else
+                table->ColumnsAutoFitWidth += TableGetColumnWidthAuto(table, column);
+        }
 
     // Update scroll
     if ((table->Flags & ImGuiTableFlags_ScrollX) == 0 && inner_window != outer_window)
@@ -1260,9 +1275,7 @@ void    ImGui::EndTable()
     PopID();
 
     // Restore window data that we modified
-    const float backup_outer_cursor_pos_x = outer_window->DC.CursorPos.x;
-    const float backup_outer_max_pos_x = outer_window->DC.CursorMaxPos.x;
-    const float backup_inner_max_pos_x = inner_window->DC.CursorMaxPos.x;
+    const ImVec2 backup_outer_max_pos = outer_window->DC.CursorMaxPos;
     inner_window->WorkRect = table->HostBackupWorkRect;
     inner_window->ParentWorkRect = table->HostBackupParentWorkRect;
     inner_window->SkipItems = table->HostSkipItems;
@@ -1274,7 +1287,7 @@ void    ImGui::EndTable()
     // Layout in outer window
     // (FIXME: To allow auto-fit and allow desirable effect of SameLine() we dissociate 'used' vs 'ideal' size by overriding
     // CursorPosPrevLine and CursorMaxPos manually. That should be a more general layout feature, see same problem e.g. #3414)
-    const float outer_width = table->IsOuterRectAutoFitX ? table->WorkRect.GetWidth() : table->ColumnsAutoFitWidth;
+    const float outer_width = table->IsOuterRectMinFitX ? table->WorkRect.GetWidth() : table->ColumnsAutoFitWidth;
     const float outer_height = table->OuterRect.GetHeight();
     if (inner_window != outer_window)
     {
@@ -1286,22 +1299,16 @@ void    ImGui::EndTable()
         outer_window->DC.CursorPosPrevLine.x = table->OuterRect.Max.x;
     }
 
-    // Override EndChild/ItemSize max extent with our own to enable auto-resize on the X axis when possible
+    // Override declared contents width to enable auto-resize on the X axis when possible.
     // FIXME-TABLE: This can be improved (e.g. for Fixed columns we don't want to auto AutoFitWidth? or propagate window auto-fit to table?)
     if (table->Flags & ImGuiTableFlags_ScrollX)
-    {
-        float max_pos_x = backup_inner_max_pos_x;
-        if (table->RightMostEnabledColumn != -1)
-            max_pos_x = ImMax(max_pos_x, table->Columns[table->RightMostEnabledColumn].MaxX);
-        if (table->ResizedColumn != -1)
-            max_pos_x = ImMax(max_pos_x, table->ResizeLockMinContentsX2);
-        inner_window->DC.CursorMaxPos.x = max_pos_x; // For inner scrolling
-        outer_window->DC.CursorMaxPos.x = ImMax(backup_outer_max_pos_x, backup_outer_cursor_pos_x + table->ColumnsGivenWidth + inner_window->ScrollbarSizes.x); // For outer scrolling
-    }
+        outer_window->DC.CursorMaxPos.x = ImMax(backup_outer_max_pos.x, table->OuterRect.Min.x + table->ColumnsGivenWidth + inner_window->ScrollbarSizes.x); // For outer scrolling
     else
-    {
-        outer_window->DC.CursorMaxPos.x = ImMax(backup_outer_max_pos_x, table->WorkRect.Min.x + outer_width); // For auto-fit
-    }
+        outer_window->DC.CursorMaxPos.x = ImMax(backup_outer_max_pos.x, table->WorkRect.Min.x + outer_width); // For auto-fit
+
+    // Override declared contents height
+    if (inner_window == outer_window && !(flags & ImGuiTableFlags_NoHostExtendY))
+        outer_window->DC.CursorMaxPos.y = ImMax(outer_window->DC.CursorMaxPos.y, inner_content_max_y);
 
     // Save settings
     if (table->IsSettingsDirty)
@@ -1458,7 +1465,7 @@ ImRect ImGui::TableGetCellBgRect(const ImGuiTable* table, int column_n)
 // Return the resizing ID for the right-side of the given column.
 ImGuiID ImGui::TableGetColumnResizeID(const ImGuiTable* table, int column_n, int instance_no)
 {
-    IM_ASSERT(column_n < table->ColumnsCount);
+    IM_ASSERT(column_n >= 0 && column_n < table->ColumnsCount);
     ImGuiID id = table->ID + 1 + (instance_no * table->ColumnsCount) + column_n;
     return id;
 }
@@ -2346,7 +2353,7 @@ void ImGui::TableMergeDrawChannels(ImGuiTable* table)
 void ImGui::TableDrawBorders(ImGuiTable* table)
 {
     ImGuiWindow* inner_window = table->InnerWindow;
-    if (inner_window->Hidden || !table->HostClipRect.Overlaps(table->InnerClipRect))
+    if (!table->OuterWindow->ClipRect.Overlaps(table->OuterRect))
         return;
 
     ImDrawList* inner_drawlist = inner_window->DrawList;
@@ -2375,7 +2382,7 @@ void ImGui::TableDrawBorders(ImGuiTable* table)
             if (column->MaxX > table->InnerClipRect.Max.x && !is_resized)
                 continue;
             if (column->NextEnabledColumn == -1 && !is_resizable)
-                if ((table->Flags & ImGuiTableFlags_SizingMask_) != ImGuiTableFlags_SizingFixedSame || table->IsOuterRectAutoFitX)
+                if ((table->Flags & ImGuiTableFlags_SizingMask_) != ImGuiTableFlags_SizingFixedSame || table->IsOuterRectMinFitX)
                     continue;
             if (column->MaxX <= column->ClipRect.Min.x) // FIXME-TABLE FIXME-STYLE: Assume BorderSize==1, this is problematic if we want to increase the border size..
                 continue;

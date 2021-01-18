@@ -552,6 +552,8 @@ void SetLStickYAxis(sf::Joystick::Axis lStickYAxis, bool inverted) {
 
 /////////////// Image Overloads
 
+
+
 void Image(const sf::Texture& texture, const sf::Color& tintColor,
            const sf::Color& borderColor) {
     Image(texture, static_cast<sf::Vector2f>(texture.getSize()), tintColor,
@@ -579,16 +581,19 @@ void Image(const sf::Texture& texture, const sf::Vector2f& size,
            const sf::FloatRect& textureRect, const sf::Color& tintColor,
            const sf::Color& borderColor) {
     sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
-    ImVec2 uv0(textureRect.left / textureSize.x,
+    /*ImVec2 uv0(textureRect.left / textureSize.x,
                textureRect.top / textureSize.y);
     ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x,
-               (textureRect.top + textureRect.height) / textureSize.y);
+        (textureRect.top + textureRect.height) / textureSize.y);*/
+    ImVec2 uv0(textureRect.left / textureSize.x, (textureRect.top + textureRect.height) / textureSize.y);
+    ImVec2 uv1((textureRect.left + textureRect.width) / textureSize.x, textureRect.top / textureSize.y);
 
     ImTextureID textureID =
         convertGLTextureHandleToImTextureID(texture.getNativeHandle());
     ImGui::Image(textureID, ImVec2(size.x, size.y), uv0, uv1, toImColor(tintColor),
         toImColor(borderColor));
 }
+
 
 void Image(const sf::Sprite& sprite, const sf::Color& tintColor,
            const sf::Color& borderColor) {

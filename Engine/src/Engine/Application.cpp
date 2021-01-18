@@ -1,109 +1,80 @@
 #include "enpch.h"
 #include "Application.h"
 
+
 namespace Engine {
 
-	Window* Application::window;
+	Engine::Application* Engine::Application::s_Instance = new Engine::Application();
 
 	Application::Application()
 	{
-		init();
-		//PushLayer(new Menu());
-		PushLayer(new GameLayer());
-	}
+		mp_Window = new Window();
 
-	void Application::init()
-	{
-		window = new Window();
-
-		ImGui::SFML::Init(*window->m_Window);
+		ImGui::SFML::Init(*mp_Window->m_Window);
 		Log::InitLog();
 
-		m_Camera.m_View.setSize(window->GetWidth(), window->GetHeight());
-		window->m_Window->setView(m_Camera.m_View);
-
+		PushLayer(new EditorLayer());
+		PushOverlay(new ImGuiLayer());
 	}
 
 	void Application::Run()
 	{
-		while (window->m_Window->isOpen())
+		while (mp_Window->m_Window->isOpen())
 		{
 			UpdateTimestep();
 			OnEvent(m_Event);
 			OnUpdate();
 			Render();
 		}
-		ImGui::SFML::Shutdown();
 	}
 
 	void Application::OnEvent(sf::Event& event)
 	{
-		while (window->m_Window->pollEvent(event))
+		while (mp_Window->m_Window->pollEvent(event))
 		{
-			ImGui::SFML::ProcessEvent(event);
-
 			if (m_Event.type == sf::Event::Closed)
-				window->m_Window->close();
+				mp_Window->m_Window->close();
 
 			if (m_LayerStack.GetSize() != 0)
-				m_LayerStack.top()->OnEvent(event);
-
-			if (event.type == sf::Event::MouseWheelMoved)
 			{
-				if (event.mouseWheel.delta == 1)
-				{
-					m_Camera.Zoom(0.95f);
-				}
-				else if (event.mouseWheel.delta == -1)
-				{
-					m_Camera.Zoom(1.05f);
-				}
+				for (Layer* layer : m_LayerStack)
+					layer->OnEvent(event);
 			}
-
 		}
 	}
 
 	void Application::OnUpdate()
 	{
-		ImGui::SFML::Update(*window->m_Window, clock.restart());
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-			m_Camera.Move(-m_Camera.speed, 0.0f);
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-			m_Camera.Move(+m_Camera.speed, 0.0f);
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-			m_Camera.Move(0.0f, -m_Camera.speed);
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-			m_Camera.Move(0.0f, +m_Camera.speed);
-
-
 		if (m_LayerStack.GetSize() != 0)
-			m_LayerStack.top()->OnUpdate(m_Timestep);
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
-			m_Camera.Move(sf::Vector2f(1.0f, 1.0f));
-			ENGINE_INFO("Camera center is {0}, {1}", m_Camera.m_View.getCenter().x, m_Camera.m_View.getCenter().y);
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate(m_Timestep);
+			}
 		}
 
 	}
 
 	void Application::Render()
 	{
-		window->m_Window->setView(m_Camera.m_View);
-
-		window->m_Window->clear();
+		mp_Window->m_Window->clear();
 
 		if (m_LayerStack.GetSize() != 0)
-			m_LayerStack.top()->Render(*window->m_Window);
+		{
 
-		ImGui::Begin("Sample window");
-		ImGui::End();
 
-		ImGui::SFML::Render(*window->m_Window);
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnImGuiRender(*mp_Window->m_Window);
+			}
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->Render(*mp_Window->m_Window);
+			}
 
-		window->m_Window->display();
+		}
+		
+		mp_Window->m_Window->display();
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -116,5 +87,14 @@ namespace Engine {
 		m_LayerStack.PopLayer(layer);
 	}
 
+	void Application::PushOverlay(Layer* layer)
+	{
+		m_LayerStack.PushOverlay(layer);
+	}
+
+	void Application::PopOverlay(Layer* layer)
+	{
+		m_LayerStack.PopOverlay(layer);
+	}
 
 }

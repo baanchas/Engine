@@ -8,10 +8,10 @@ namespace Engine {
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();
 
-		virtual void OnEvent(sf::Event& event) = 0;
-		virtual void OnUpdate(float& ts) = 0;
-		virtual void Render(sf::RenderTarget& rt) = 0;
-
+		virtual void OnEvent(sf::Event& event) {};
+		virtual void OnUpdate(float& time) {};
+		virtual void Render(sf::RenderTarget& rt) {};
+		virtual void OnImGuiRender(sf::RenderTarget& rt) {};
 
 		inline const std::string& GetName() const
 		{

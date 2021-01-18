@@ -23,3 +23,8 @@
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
 #include <SFML/Window.hpp>
+
+//------- ImGui -------------------
+
+#include "imgui.h"
+#include "imgui-sfml.h"
