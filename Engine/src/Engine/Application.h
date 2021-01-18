@@ -3,13 +3,14 @@
 #include "Engine/Graphics/window.h"
 #include "Engine/LayerStack.h"
 
+#include "Engine/Components/OrthographicCameraComponent.h"
+
+#include "Layer.h"
+
+#include "Engine/ImGuiLayer.h"
+#include "Engine/EditorLayer.h"
 #include "Game/Menu.h"
-#include "Game/GameLayer.h"
 
-#include "Engine/Camera/OrthographicCamera.h"
-
-#include "imgui.h"
-#include "imgui-sfml.h"
 
 namespace Engine {
 
@@ -17,10 +18,8 @@ namespace Engine {
 	{
 
 	public:
-		Application();
-		~Application() { delete window; };
-
-		void init();
+		
+		~Application() { delete mp_Window; };
 
 		void Run();
 		void OnEvent(sf::Event& event);
@@ -29,26 +28,34 @@ namespace Engine {
 
 		void PushLayer(Layer* layer);
 		void PopLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
+		void PopOverlay(Layer* layer);
 
-		static inline sf::RenderWindow* GetWindow() { return window->m_Window; }
+		void Close() { mp_Window->m_Window->close(); }
 
 		void UpdateTimestep() { m_Timestep = clock.restart().asSeconds(); }
+
+		inline sf::RenderWindow* GetWindow() { return mp_Window->m_Window; }
+		inline sf::Clock& GetTime() { return clock; }
+
+		static Application* Get() { return s_Instance; }
 	public:
-		static Window* window;
+		Window* mp_Window;
 
 	private:
-		sf::Color bgColor;
+		
 		LayerStack m_LayerStack;
+		//ImGuiLayer* m_ImGuiLayer;
 
-		float color[3] = { 0.f, 0.f, 0.f };
 		float m_Timestep;
-
-		//sf::View _Camera;
-		OrthographicCamera m_Camera;
 
 		sf::Event m_Event;
 		sf::Clock clock;
+
+
+		static Application* s_Instance;
+
+		Application();
 	};
 
-	//Application* CreateApplication();
 }

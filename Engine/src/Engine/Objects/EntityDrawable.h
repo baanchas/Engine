@@ -19,10 +19,10 @@ namespace Engine {
 
 		inline virtual sf::Vector2f GetPosition() const	{ return m_Sprite.getPosition(); }
 
-	protected:
 		std::string m_Name;
 		sf::Texture m_Texture;
 		sf::Sprite m_Sprite;
+	protected:
 
 	};
 

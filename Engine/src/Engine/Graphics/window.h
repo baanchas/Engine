@@ -36,8 +36,10 @@ namespace Engine {
 		inline unsigned int GetHeight() const { return m_Window->getSize().y; }
 
 		void SetVSync(bool& VSync) { m_Window->setVerticalSyncEnabled(VSync); }
+
 	public:
 		sf::RenderWindow* m_Window;
+
 	private:
 		WindowProps props;
 	};

@@ -3,9 +3,9 @@
 
 int main()
 {
-	Engine::Application app;
+	Engine::Application::Get()->Run();
 
-	app.Run();
+	//app.Run();
 
 	//std::cin.get();
 	return 0;
