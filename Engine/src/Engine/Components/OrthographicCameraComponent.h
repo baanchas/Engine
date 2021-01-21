@@ -15,6 +15,9 @@ namespace Engine {
 
 		void SetSize(float x, float y);
 
+		void ZoomIn();
+		void ZoomOut();
+
 		inline sf::View GetCamera() const { return m_View; }
 
 	public:
@@ -24,10 +27,8 @@ namespace Engine {
 	private:
 		sf::Vector2f m_oldCenter = m_View.getCenter();
 
-		float m_OldWidth = 1280;
-		float m_OldHeight = 720;
 		float m_zoomLevel = 1.0f;
-		float speed = 3.0f;
+		float speed = 10.0f;
 	};
 
 }

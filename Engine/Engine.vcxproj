@@ -105,6 +105,8 @@
     <ClCompile Include="src\Engine\ImGuiLayer.cpp" />
     <ClCompile Include="src\Engine\Objects\Entity.cpp" />
     <ClCompile Include="src\Engine\Objects\EntityDrawable.cpp" />
+    <ClCompile Include="src\Engine\Objects\EntityShape.cpp" />
+    <ClCompile Include="src\Engine\Objects\Shapes\Rectangle.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\enpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -126,6 +128,8 @@
     <ClInclude Include="src\Engine\Input\KeyCodes.h" />
     <ClInclude Include="src\Engine\Objects\Entity.h" />
     <ClInclude Include="src\Engine\Objects\EntityDrawable.h" />
+    <ClInclude Include="src\Engine\Objects\EntityShape.h" />
+    <ClInclude Include="src\Engine\Objects\Shapes\Rectangle.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\enpch.h" />
     <ClInclude Include="src\Engine\Graphics\window.h" />

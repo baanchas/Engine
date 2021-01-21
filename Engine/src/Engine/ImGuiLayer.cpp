@@ -19,7 +19,6 @@ namespace Engine {
 
 	void ImGuiLayer::OnUpdate(float& ts)
 	{
-		//sf::Time time = ts;
 		ImGui::SFML::Update(*Application::Get()->mp_Window->m_Window, Application::Get()->GetTime().restart());
 	}
 

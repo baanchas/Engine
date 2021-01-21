@@ -13,6 +13,7 @@ namespace Engine {
 
 	void EntityDrawable::Render(sf::RenderTarget& rt)
 	{
+		
 	}
 
 }

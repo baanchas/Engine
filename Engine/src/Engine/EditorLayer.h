@@ -8,6 +8,8 @@
 
 #include "Game/Player.h"
 
+#include "Engine/Objects//Shapes/Rectangle.h"
+
 namespace Engine {
 
 	class EditorLayer : public Layer
@@ -24,13 +26,21 @@ namespace Engine {
 		void RenderToTexure(sf::RenderTarget& rt);
 
 
-		Player* m_Player;
 	private:
 		sf::RenderTexture* m_RenderTexture;
+		Player* m_Player;
+
+		Rectangle rect_1;
+		Rectangle rect_2;
 
 		WindowProps props;
 		OrthographicCameraComponent m_Camera;
-		sf::Sprite sprite;
+
+		sf::Sprite sprites[4];
+		sf::Texture texture1;
+
+		float colors[3] = { 0.0f, 0.0f, 0.0f, };
+		sf::Color m_color;
 
 		ImGuiViewport* m_Viewport;
 		ImGuiWindowFlags m_Windowflags;

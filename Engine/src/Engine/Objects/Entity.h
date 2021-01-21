@@ -9,7 +9,8 @@ namespace Engine {
 		Entity();
 		virtual ~Entity();
 
-		virtual void Render(sf::RenderTarget& rt) = 0;
+		virtual void Render(sf::RenderTarget& rt) {}
+		virtual void Update(float& ts) {}
 	protected:
 		std::string m_Name;
 	};

@@ -20,94 +20,33 @@ namespace Engine {
 
 	void OrthographicCameraComponent::OnEvent(sf::Event& event)
 	{
-		if (event.type == sf::Event::Resized)
-		{
-			//CalculateView(Application::Get()->mp_Window->GetWidth(), Application::Get()->mp_Window->GetHeight());
-			/*if (m_OldWidth != Application::Get()->mp_Window->GetWidth() && m_OldHeight == Application::Get()->mp_Window->GetHeight())
-			{
-				m_View.setSize(Application::Get()->mp_Window->GetWidth(), Application::Get()->mp_Window->GetHeight());
-				m_zoomLevel = m_zoomLevel * (m_OldWidth / Application::Get()->mp_Window->GetWidth());
-				m_View.zoom(m_zoomLevel);
-				m_OldWidth = Application::Get()->mp_Window->GetWidth();
-			}
-			else if (m_OldWidth == Application::Get()->mp_Window->GetWidth() && m_OldHeight != Application::Get()->mp_Window->GetHeight())
-			{
-				m_View.setSize(Application::Get()->mp_Window->GetWidth(), Application::Get()->mp_Window->GetHeight());
-				m_zoomLevel = m_zoomLevel * (m_OldHeight / Application::Get()->mp_Window->GetHeight());
-				m_View.zoom(m_zoomLevel);
-				m_OldHeight = Application::Get()->mp_Window->GetHeight();
-			}
-			else if (m_OldWidth != Application::Get()->mp_Window->GetWidth() && m_OldHeight != Application::Get()->mp_Window->GetHeight())
-			{
-				if (m_OldWidth / Application::Get()->mp_Window->GetWidth() > m_OldHeight / Application::Get()->mp_Window->GetHeight())
-				{
-					m_View.setSize(Application::Get()->mp_Window->GetWidth(), Application::Get()->mp_Window->GetHeight());
-					m_zoomLevel = m_zoomLevel * (m_OldWidth / Application::Get()->mp_Window->GetWidth());
-					m_View.zoom(m_zoomLevel);
-
-				}
-				else
-				{
-					m_View.setSize(Application::Get()->mp_Window->GetWidth(), Application::Get()->mp_Window->GetHeight());
-					m_zoomLevel = m_zoomLevel * (m_OldHeight / Application::Get()->mp_Window->GetHeight());
-					m_View.zoom(m_zoomLevel);
-					
-				}
-				m_OldWidth = Application::Get()->mp_Window->GetWidth();
-				m_OldHeight = Application::Get()->mp_Window->GetHeight();
-			}*/
-		}
 	
 		if (event.type == sf::Event::MouseWheelMoved)
 		{
 			if (event.mouseWheel.delta == 1)
 			{
-				m_View.zoom(0.95f);
-				m_zoomLevel = m_zoomLevel * 0.95f;
+				ZoomIn();
 			}
 			else if (event.mouseWheel.delta == -1)
 			{
-				m_View.zoom(1.05f);
-				m_zoomLevel = m_zoomLevel * 1.05f;
+				ZoomOut();
 			}
+
+			ENGINE_WARNING("Zoomlevel is {0}", m_zoomLevel);
 		}
 	}
 
 	void OrthographicCameraComponent::CalculateView(float x, float y)
 	{
-		if (m_OldWidth != x && m_OldHeight == y)
-		{
-			m_View.setSize(x, y);
-			m_zoomLevel = m_zoomLevel * (m_OldWidth / x);
-			m_View.zoom(m_zoomLevel);
-			m_OldWidth = x;
-		}
-		else if (m_OldWidth == x && m_OldHeight != y)
-		{
-			m_View.setSize(x, y);
-			m_zoomLevel = m_zoomLevel * (m_OldHeight / y);
-			m_View.zoom(m_zoomLevel);
-			m_OldHeight = y;
-		}
-		else if (m_OldWidth != x && m_OldHeight != y)
-		{
-			if (m_OldWidth / x > m_OldHeight / y)
-			{
-				m_View.setSize(x, y);
-				m_zoomLevel = m_zoomLevel * (m_OldWidth / x);
-				m_View.zoom(m_zoomLevel);
-				m_OldWidth = x;
-				m_OldHeight = y;
-			}
-			else
-			{
-				m_View.setSize(x, y);
-				m_zoomLevel = m_zoomLevel * (m_OldHeight / y);
-				m_View.zoom(m_zoomLevel);
-				m_OldWidth = x;
-				m_OldHeight = y;
-			}
+		m_View.setSize(x, y);
 
+		if (1280.0f / x > 720.0f / y)
+		{
+			m_View.zoom(m_zoomLevel * (1280.0f / x));
+		}
+		else
+		{
+			m_View.zoom(m_zoomLevel * (720.0f / y));
 		}
 	}
 
@@ -129,6 +68,7 @@ namespace Engine {
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
 			m_View.rotate(-3.0f);
 
+
 	 	m_oldCenter = m_View.getCenter();
 	}
 
@@ -136,5 +76,17 @@ namespace Engine {
 	void OrthographicCameraComponent::SetSize(float x, float y)
 	{
 		m_View.setSize(x, y);
+	}
+
+	void OrthographicCameraComponent::ZoomIn()
+	{
+		m_View.zoom(0.95f);
+		m_zoomLevel = m_zoomLevel * 0.95f;
+	}
+
+	void OrthographicCameraComponent::ZoomOut()
+	{
+		m_View.zoom(1.05f);
+		m_zoomLevel = m_zoomLevel * 1.05f;
 	}
 }

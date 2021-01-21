@@ -11,8 +11,4 @@ namespace Engine {
 	{
 	}
 
-	void Entity::Render(sf::RenderTarget& rt)
-	{
-	}
-
 }
