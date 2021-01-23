@@ -58,12 +58,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\lib\GLFW\include;$(SolutionDir)Engine\lib\imgui\imgui-sfml;$(SolutionDir)Engine\lib\spdlog\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\lib\SFML\include;$(SolutionDir)Engine\lib\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\lib\entt\include\;$(SolutionDir)Engine\lib\GLFW\include;$(SolutionDir)Engine\lib\imgui\imgui-sfml;$(SolutionDir)Engine\lib\spdlog\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\lib\SFML\include;$(SolutionDir)Engine\lib\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6387;26498;26812;6386;26495;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>enpch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,12 +79,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\lib\GLFW\include;$(SolutionDir)Engine\lib\imgui\imgui-sfml;$(SolutionDir)Engine\lib\spdlog\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\lib\SFML\include;$(SolutionDir)Engine\lib\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\lib\entt\include\;$(SolutionDir)Engine\lib\GLFW\include;$(SolutionDir)Engine\lib\imgui\imgui-sfml;$(SolutionDir)Engine\lib\spdlog\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\lib\SFML\include;$(SolutionDir)Engine\lib\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>6387;26498;26812;6386;26495;26451;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>enpch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,8 +108,8 @@
     <ClCompile Include="src\Engine\Objects\Entity.cpp" />
     <ClCompile Include="src\Engine\Objects\EntityDrawable.cpp" />
     <ClCompile Include="src\Engine\Objects\EntityShape.cpp" />
+    <ClCompile Include="src\Engine\Objects\Scene.cpp" />
     <ClCompile Include="src\Engine\Objects\Shapes\Rectangle.cpp" />
-    <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\enpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -123,14 +125,15 @@
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\Application.h" />
+    <ClInclude Include="src\Engine\Components\Components.h" />
     <ClInclude Include="src\Engine\Components\OrthographicCameraComponent.h" />
     <ClInclude Include="src\Engine\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Input\KeyCodes.h" />
     <ClInclude Include="src\Engine\Objects\Entity.h" />
     <ClInclude Include="src\Engine\Objects\EntityDrawable.h" />
     <ClInclude Include="src\Engine\Objects\EntityShape.h" />
+    <ClInclude Include="src\Engine\Objects\Scene.h" />
     <ClInclude Include="src\Engine\Objects\Shapes\Rectangle.h" />
-    <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\enpch.h" />
     <ClInclude Include="src\Engine\Graphics\window.h" />
     <ClInclude Include="src\Engine\LayerStack.h" />

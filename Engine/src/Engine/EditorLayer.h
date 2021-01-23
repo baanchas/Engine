@@ -10,6 +10,9 @@
 
 #include "Engine/Objects//Shapes/Rectangle.h"
 
+#include "Engine/Components/Components.h"
+
+#include "Engine/Objects/Scene.h"
 namespace Engine {
 
 	class EditorLayer : public Layer
@@ -29,6 +32,8 @@ namespace Engine {
 	private:
 		sf::RenderTexture* m_RenderTexture;
 		Player* m_Player;
+		Scene* m_ActiveScene;
+
 
 		Rectangle rect_1;
 		Rectangle rect_2;
@@ -42,8 +47,11 @@ namespace Engine {
 		float colors[3] = { 0.0f, 0.0f, 0.0f, };
 		sf::Color m_color;
 
-		ImGuiViewport* m_Viewport;
-		ImGuiWindowFlags m_Windowflags;
+		TransformComponent tc;
+
+
+		Entity entt;
+
 	};
 
 }

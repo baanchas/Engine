@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 
 //------- Input -------------------
 
@@ -28,3 +29,5 @@
 
 #include "imgui.h"
 #include "imgui-sfml.h"
+
+//------- EnTT --------------------

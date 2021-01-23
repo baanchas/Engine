@@ -5,7 +5,7 @@ namespace Engine {
 
 	Rectangle::Rectangle()
 	{
-		m_Name = "Rectangle";
+		//m_Name = "Rectangle";
 	}
 
 	Rectangle::~Rectangle()

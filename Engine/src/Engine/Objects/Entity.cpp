@@ -3,12 +3,15 @@
 
 namespace Engine {
 
-	Entity::Entity()
+	Entity::Entity(entt::entity id, Scene* scene)
+		: m_EntityId(id), m_Scene(scene)
 	{
 	}
 
 	Entity::~Entity()
 	{
 	}
+
+	
 
 }

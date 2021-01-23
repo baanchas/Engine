@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Engine/Objects/EntityShape.h"
+#include "Engine/Objects/Entity.h"
 
 namespace Engine {
 
-	class Rectangle : public EntityShape
+	class Rectangle : public Entity
 	{
 	public:
 		Rectangle();
@@ -33,7 +33,6 @@ namespace Engine {
 		void SetColor(sf::Color color) { m_RectangleShape.setFillColor(color); }
 		inline const sf::Color& GetColor() const { return m_RectangleShape.getFillColor(); }
 		
-
 	private:
 		sf::RectangleShape m_RectangleShape;
 	};

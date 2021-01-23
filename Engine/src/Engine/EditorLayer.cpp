@@ -6,16 +6,21 @@ namespace Engine {
 
 	EditorLayer::EditorLayer()
 	{
-
 		m_Name = "Editor Layer";
 
 		ENGINE_INFO("{0} Layer is Pushed!", m_Name);
 
-		m_Windowflags |= ImGuiWindowFlags_MenuBar | ImGuiDockNodeFlags_None | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-		m_Player = new Player();
+		m_ActiveScene = new Scene();
 
 		m_Camera.SetSize(props.Width, props.Height);
+		
+		entt = m_ActiveScene->CreateEntity();
+		
+		//entt.AddComponent<TransformComponent>();
+		entt.AddComponent<RectangleCOmponent>();
+		entt.AddComponent<ColorComponent>();
+
+		m_Player = new Player();
 
 		texture1.loadFromFile("resources/sprites/checkerboard.png");
 		for (int i = 0; i < 4; i++)
@@ -41,8 +46,8 @@ namespace Engine {
 	EditorLayer::~EditorLayer()
 	{
 		delete m_Player;
-		delete m_Viewport;
 		delete m_RenderTexture;
+		delete m_ActiveScene;
 	}
 
 	void EditorLayer::OnEvent(sf::Event& event)
@@ -52,11 +57,25 @@ namespace Engine {
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
+		m_ActiveScene->OnUpdate(ts);
+
+		ENGINE_INFO("{0} {1} {2}", colors[0] * 255, colors[1] * 255, colors[2] * 255);
+		auto& cc = entt.GetComponent<ColorComponent>();
+		//rect_2.SetColor(sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255));
+		cc.Color = sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			auto& tc =entt.GetComponent<TransformComponent>();
+			tc.Position += sf::Vector2f(1, 1);
+		}
+
 		m_Camera.OnUpdate(ts);
 	}
 
 	void EditorLayer::Render(sf::RenderTarget& rt)
 	{
+		
 	}
 
 	void EditorLayer::RenderToTexure(sf::RenderTarget& rt)
@@ -69,6 +88,8 @@ namespace Engine {
 		rect_1.Render(rt);
 		rect_1.Rotate(1);
 		rect_2.Render(rt);
+
+		m_ActiveScene->Render(rt);
 	}
 
 	void EditorLayer::OnImGuiRender(sf::RenderTarget& rt)
@@ -76,15 +97,18 @@ namespace Engine {
 		bool dockspaceOpen = true;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-		m_Viewport = ImGui::GetMainViewport();
+		ImGuiWindowFlags Windowflags = ImGuiWindowFlags_MenuBar | ImGuiDockNodeFlags_None | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-		ImGui::SetNextWindowPos(m_Viewport->Pos);
-		ImGui::SetNextWindowSize(m_Viewport->Size);
-		ImGui::SetNextWindowViewport(m_Viewport->ID);
+		ImGuiViewport* Viewport = ImGui::GetMainViewport();
+
+
+		ImGui::SetNextWindowPos(Viewport->Pos);
+		ImGui::SetNextWindowSize(Viewport->Size);
+		ImGui::SetNextWindowViewport(Viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, m_Windowflags);
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, Windowflags);
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar(2);
 
@@ -131,7 +155,7 @@ namespace Engine {
 		sf::RenderTexture renderTarget;
 		renderTarget.create(AvailableContentSize.x, AvailableContentSize.y);
 		renderTarget.clear();
-		//ENGINE_INFO("{0} {1}", ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
+		
 		rect_2.SetColor(sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255));
 
 		renderTarget.setView(m_Camera.m_View);
