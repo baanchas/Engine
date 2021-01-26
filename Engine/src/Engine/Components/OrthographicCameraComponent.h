@@ -20,9 +20,12 @@ namespace Engine {
 
 		inline sf::View GetCamera() const { return m_View; }
 
+		void CalculateView(float x, float y);
+		void CalculateView(sf::Vector2f vec);
+
+
 	public:
 		sf::View m_View;
-		void CalculateView(float x, float y);
 
 	private:
 		sf::Vector2f m_oldCenter = m_View.getCenter();

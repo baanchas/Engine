@@ -8,7 +8,7 @@ namespace Engine {
 
 	Scene::Scene()
 	{
-
+		ENGINE_INFO("Scene loaded!");
 	}
 
 	Scene::~Scene()
@@ -18,34 +18,58 @@ namespace Engine {
 
 	void Scene::OnUpdate(float& ts)
 	{
-		auto groupTCRC = m_Registry.group<TransformComponent>(entt::get<RectangleCOmponent>);
-		for (auto entity : groupTCRC)
-		{
-			auto [transform, shape] = groupTCRC.get<TransformComponent, RectangleCOmponent>(entity);
 
-			shape.rect.setScale(transform.Scale);
-			shape.rect.setPosition(transform.GetPosition());
-			//shape.rect.setFillColor(sf::Color::Red);
+		auto viewRCTC = m_Registry.view<RectangleCOmponent, TransformComponent>();
+		for (auto entity : viewRCTC)
+		{
+			RectangleCOmponent& rc = m_Registry.get<RectangleCOmponent>(entity);
+			TransformComponent& tc = m_Registry.get<TransformComponent>(entity);
+
+			rc.rect.setScale(tc.Scale);
+			rc.rect.setPosition(tc.GetPosition());
+
+			if (m_Registry.has<ColorComponent>(entity))
+			{
+				ColorComponent& cc = m_Registry.get<ColorComponent>(entity);
+				rc.rect.setFillColor(cc.Color);
+			}
 		}
 
-		auto groupTCCC = m_Registry.group<RectangleCOmponent>(entt::get<ColorComponent>);
-		for (auto entity : groupTCCC)
+		auto viewSCTC = m_Registry.view<SpriteComponent, TransformComponent>();
+		for (auto entity : viewSCTC)
 		{
-			auto [shape, color] = groupTCCC.get<RectangleCOmponent, ColorComponent>(entity);
-
-			shape.rect.setFillColor(color.Color);
+			SpriteComponent& sc = m_Registry.get<SpriteComponent>(entity);
+			TransformComponent& tc = m_Registry.get<TransformComponent>(entity);
+			sc.Sprite.setScale(tc.Scale);
+			sc.Sprite.setPosition(tc.GetPosition());
 		}
 
+/*		auto viewSCTC = m_Registry.view<SpriteComponent, TransformComponent>();
+		for (auto entity : viewSCTC)
+		{
+			SpriteComponent& sc = m_Registry.get<SpriteComponent>(entity);
+			TransformComponent& tc = m_Registry.get<TransformComponent>(entity);
+			sc.Sprite.setScale(tc.Scale);
+			sc.Sprite.setPosition(tc.GetPosition());
+		}*/
 	}
 
 	void Scene::Render(sf::RenderTarget& rt)
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<RectangleCOmponent>);
-		for (auto entity : group)
-		{
-			auto [transform, shape] = group.get<TransformComponent, RectangleCOmponent>(entity);
+		//bool render = false;
 
-			rt.draw(shape.rect);
+		auto view = m_Registry.view<RectangleCOmponent>();
+		for (auto entity : view)
+		{
+			RectangleCOmponent& rc = m_Registry.get<RectangleCOmponent>(entity);
+			rt.draw(rc.rect);
+		}
+		
+		auto viewSprite = m_Registry.view<SpriteComponent>();
+		for (auto entity : viewSprite)
+		{
+			SpriteComponent& sc = m_Registry.get<SpriteComponent>(entity);
+			rt.draw(sc.Sprite);
 		}
 	}
 

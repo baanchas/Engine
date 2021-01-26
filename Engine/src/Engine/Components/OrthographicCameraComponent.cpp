@@ -6,7 +6,7 @@ namespace Engine {
 
 	OrthographicCameraComponent::OrthographicCameraComponent()
 	{
-		m_View.setCenter(640, 360);
+		//m_View.setCenter(640, 360);
 	}
 
 	OrthographicCameraComponent::OrthographicCameraComponent(float sizeX, float sizeY)
@@ -47,6 +47,21 @@ namespace Engine {
 		else
 		{
 			m_View.zoom(m_zoomLevel * (720.0f / y));
+		}
+	}
+
+
+	void OrthographicCameraComponent::CalculateView(sf::Vector2f vec)
+	{
+		m_View.setSize(vec.x, vec.y);
+
+		if (1280.0f / vec.x > 720.0f / vec.y)
+		{
+			m_View.zoom(m_zoomLevel * (1280.0f / vec.x));
+		}
+		else
+		{
+			m_View.zoom(m_zoomLevel * (720.0f / vec.y));
 		}
 	}
 

@@ -20,7 +20,7 @@ namespace Engine {
 		void OnUpdate(float& ts);
 		void Render(sf::RenderTarget& rt);
 
-
+		inline size_t Count() const { return m_Registry.size(); }
 	private:
 		entt::registry m_Registry;
 

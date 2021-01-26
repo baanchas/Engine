@@ -6,21 +6,36 @@ namespace Engine {
 
 	EditorLayer::EditorLayer()
 	{
-		m_Name = "Editor Layer";
-
 		ENGINE_INFO("{0} Layer is Pushed!", m_Name);
 
-		m_ActiveScene = new Scene();
+		m_Name = "Editor Layer";
 
-		m_Camera.SetSize(props.Width, props.Height);
+		m_ActiveScene = new Scene();
 		
 		entt = m_ActiveScene->CreateEntity();
-		
-		//entt.AddComponent<TransformComponent>();
-		entt.AddComponent<RectangleCOmponent>();
-		entt.AddComponent<ColorComponent>();
+		entity = m_ActiveScene->CreateEntity();
+		m_Camera = m_ActiveScene->CreateEntity();
+		m_SecondCamera = m_ActiveScene->CreateEntity();
 
-		m_Player = new Player();
+		PrimaryCamera = &m_Camera;
+
+		m_Camera.AddComponent<CameraComponent>();
+		
+		m_SecondCamera.AddComponent<CameraComponent>();
+		
+		
+		entity.AddComponent<RectangleCOmponent>(sf::Vector2f(100, 100));
+		auto& rc1 = entity.GetComponent<RectangleCOmponent>();
+		rc1.SetOrigin();
+		auto& tc1 = entity.GetComponent<TransformComponent>();
+		tc1.Position = sf::Vector2f(1000, 200);
+
+		entt.AddComponent<RectangleCOmponent>(sf::Vector2f(200, 200));
+		auto& rc = entt.GetComponent<RectangleCOmponent>();
+		rc.SetOrigin();
+		auto& tc = entt.GetComponent<TransformComponent>();
+		tc.Position = sf::Vector2f(400, 400);
+		entt.AddComponent<ColorComponent>();
 
 		texture1.loadFromFile("resources/sprites/checkerboard.png");
 		for (int i = 0; i < 4; i++)
@@ -28,49 +43,79 @@ namespace Engine {
 			sprites[i].setTexture(texture1);
 			sprites[i].setScale(6, 6);
 			if (i % 2)
-				sprites[i].setPosition((i / 2) * sprites[i].getTexture()->getSize().x * 6, 0);
+				sprites[i].setPosition((i / 2) * (float)sprites[i].getTexture()->getSize().x * 6, 0);
 			else
-				sprites[i].setPosition((i / 2) * sprites[i].getTexture()->getSize().x * 6, 2 * sprites[i].getTexture()->getSize().y * sprites[i].getScale().y / 2);
+				sprites[i].setPosition((i / 2) * (float)sprites[i].getTexture()->getSize().x * 6, 2 * sprites[i].getTexture()->getSize().y * sprites[i].getScale().y / 2);
 		}
 
-		rect_1.SetSize(sf::Vector2f(200, 200));
-		rect_1.SetPosition(200, 200);
-		rect_1.SetCenterOriginFrom(200, 200);
-		rect_1.SetColor(sf::Color::Red);
-		rect_2.SetSize(sf::Vector2f(300, 300));
-		rect_2.SetCenterOriginFrom(200, 200);
-		rect_2.SetColor(sf::Color::Cyan);
-		rect_2.SetPosition(500, 500);
+		ENGINE_INFO("{0} entities in ActiveScene", m_ActiveScene->Count());
 	}
 
 	EditorLayer::~EditorLayer()
 	{
-		delete m_Player;
 		delete m_RenderTexture;
 		delete m_ActiveScene;
+		delete PrimaryCamera;
 	}
 
 	void EditorLayer::OnEvent(sf::Event& event)
 	{
-		m_Camera.OnEvent(event);
+		if (PrimaryCamera->HasComponent<CameraComponent>())
+		{
+			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
+			camera.Camera.OnEvent(event);
+		}
 	}
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
+		if (camera1)
+		{
+			PrimaryCamera = &m_SecondCamera;
+		}
+		else
+		{
+			PrimaryCamera = &m_Camera;
+		}
+
 		m_ActiveScene->OnUpdate(ts);
 
-		ENGINE_INFO("{0} {1} {2}", colors[0] * 255, colors[1] * 255, colors[2] * 255);
+
+		if (PrimaryCamera->HasComponent<CameraComponent>())
+		{
+			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
+			camera.Camera.OnUpdate(ts);
+		}
+
+
 		auto& cc = entt.GetComponent<ColorComponent>();
-		//rect_2.SetColor(sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255));
-		cc.Color = sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255);
+		cc.Color = sf::Color((sf::Uint8)(colors[0] * 255), (sf::Uint8)(colors[1] * 255), (sf::Uint8)(colors[2] * 255));
+
+		auto& rc = entt.GetComponent<RectangleCOmponent>();
+		rc.rect.rotate(40 * ts);
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
 			auto& tc =entt.GetComponent<TransformComponent>();
-			tc.Position += sf::Vector2f(1, 1);
+			tc.Position += sf::Vector2f(100, 0) * -ts;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			auto& tc = entt.GetComponent<TransformComponent>();
+			tc.Position += sf::Vector2f(100, 0) * ts;
 		}
 
-		m_Camera.OnUpdate(ts);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			auto& tc = entt.GetComponent<TransformComponent>();
+			tc.Position += sf::Vector2f(0, 100) * -ts;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			auto& tc = entt.GetComponent<TransformComponent>();
+			tc.Position += sf::Vector2f(0, 100) * ts;
+		}
+
 	}
 
 	void EditorLayer::Render(sf::RenderTarget& rt)
@@ -78,16 +123,12 @@ namespace Engine {
 		
 	}
 
-	void EditorLayer::RenderToTexure(sf::RenderTarget& rt)
+	void EditorLayer::RenderFrameBuffer(sf::RenderTarget& rt)
 	{
 		for (auto& sprite : sprites)
 		{
 			rt.draw(sprite);
 		}
-		
-		rect_1.Render(rt);
-		rect_1.Rotate(1);
-		rect_2.Render(rt);
 
 		m_ActiveScene->Render(rt);
 	}
@@ -141,7 +182,8 @@ namespace Engine {
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Change Color", colors, ImGuiColorEditFlags_InputRGB);
-		
+		if (ImGui::Checkbox("Camera 2", &camera1));
+
 		ImGui::End();
 
 
@@ -153,16 +195,18 @@ namespace Engine {
 		ImVec2 AvailableContentSize = ImGui::GetContentRegionAvail();
 
 		sf::RenderTexture renderTarget;
-		renderTarget.create(AvailableContentSize.x, AvailableContentSize.y);
+		renderTarget.create((unsigned int)AvailableContentSize.x, (unsigned int)AvailableContentSize.y);
 		renderTarget.clear();
-		
-		rect_2.SetColor(sf::Color(colors[0] * 255, colors[1] * 255, colors[2] * 255));
 
-		renderTarget.setView(m_Camera.m_View);
+		if (PrimaryCamera->HasComponent<CameraComponent>())
+		{
+			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
+			renderTarget.setView(camera.Camera.m_View);
 
-		m_Camera.CalculateView(AvailableContentSize.x, AvailableContentSize.y);
+			camera.Camera.CalculateView(AvailableContentSize.x, AvailableContentSize.y);
+		}
 
-		RenderToTexure(renderTarget);
+		RenderFrameBuffer(renderTarget);
 		renderTarget.display();
 
 		ImGui::Image(renderTarget.getTexture(), sf::Vector2f(AvailableContentSize.x, AvailableContentSize.y), sf::FloatRect(0, 0, AvailableContentSize.x, AvailableContentSize.y));

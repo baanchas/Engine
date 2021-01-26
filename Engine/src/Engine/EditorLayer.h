@@ -6,8 +6,6 @@
 #include "Engine/Components/OrthographicCameraComponent.h"
 #include "Engine/Graphics/window.h"
 
-#include "Game/Player.h"
-
 #include "Engine/Objects//Shapes/Rectangle.h"
 
 #include "Engine/Components/Components.h"
@@ -26,20 +24,15 @@ namespace Engine {
 		void Render(sf::RenderTarget& rt) override;
 		void OnImGuiRender(sf::RenderTarget& rt) override;
 
-		void RenderToTexure(sf::RenderTarget& rt);
+		void RenderFrameBuffer(sf::RenderTarget& rt);
 
 
 	private:
 		sf::RenderTexture* m_RenderTexture;
-		Player* m_Player;
 		Scene* m_ActiveScene;
 
-
-		Rectangle rect_1;
-		Rectangle rect_2;
-
 		WindowProps props;
-		OrthographicCameraComponent m_Camera;
+		//OrthographicCameraComponent m_Camera;
 
 		sf::Sprite sprites[4];
 		sf::Texture texture1;
@@ -49,9 +42,13 @@ namespace Engine {
 
 		TransformComponent tc;
 
-
 		Entity entt;
+		Entity entity;
+		Entity m_Camera;
+		Entity m_SecondCamera;
+		Entity* PrimaryCamera;// = m_Camera;
 
+		bool camera1 = false;
 	};
 
 }

@@ -46,9 +46,8 @@ namespace Engine {
 		operator bool() const { return (int)m_EntityId != 0; }
 
 	private:
-
 		Scene* m_Scene = nullptr;
-		entt::entity m_EntityId{ 0 };
+		entt::entity m_EntityId{ entt::null };
 		std::string m_Name;
 	};
 
