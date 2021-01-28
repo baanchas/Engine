@@ -44,20 +44,18 @@ namespace Engine {
 			sc.Sprite.setPosition(tc.GetPosition());
 		}
 
-/*		auto viewSCTC = m_Registry.view<SpriteComponent, TransformComponent>();
-		for (auto entity : viewSCTC)
+		auto viewCCTC = m_Registry.view<CameraComponent, TransformComponent>();
+		for (auto entity : viewCCTC)
 		{
-			SpriteComponent& sc = m_Registry.get<SpriteComponent>(entity);
+			CameraComponent& cc = m_Registry.get<CameraComponent>(entity);
 			TransformComponent& tc = m_Registry.get<TransformComponent>(entity);
-			sc.Sprite.setScale(tc.Scale);
-			sc.Sprite.setPosition(tc.GetPosition());
-		}*/
+			cc.Camera.SetCenter(tc.Position);
+			cc.Camera.SetRotation(tc.Rotation);
+		}
 	}
 
 	void Scene::Render(sf::RenderTarget& rt)
 	{
-		//bool render = false;
-
 		auto view = m_Registry.view<RectangleCOmponent>();
 		for (auto entity : view)
 		{
@@ -73,10 +71,20 @@ namespace Engine {
 		}
 	}
 
-	Entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(std::string name)
 	{
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<TagComponent>();
+		auto& tag = entity.GetComponent<TagComponent>();
+		if (name.empty())
+		{
+			tag.Tag = "Entity";
+		}
+		else
+		{
+			tag.Tag = name;
+		}
 		return entity;
 	}
 }

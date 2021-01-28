@@ -9,6 +9,7 @@ namespace Engine {
 	public:
 		Entity() = default;
 		Entity(const Entity& other) = default;
+		//Entity(const Entity& other) = default;
 		Entity(entt::entity id, Scene* scene);
 		virtual ~Entity();
 
@@ -44,6 +45,8 @@ namespace Engine {
 		}
 
 		operator bool() const { return (int)m_EntityId != 0; }
+
+		operator uint32_t() const { return (uint32_t)m_EntityId; };
 
 	private:
 		Scene* m_Scene = nullptr;

@@ -11,6 +11,10 @@
 #include "Engine/Components/Components.h"
 
 #include "Engine/Objects/Scene.h"
+
+#include "Engine/Objects/SceneHierarchyPanel.h"
+
+
 namespace Engine {
 
 	class EditorLayer : public Layer
@@ -34,6 +38,7 @@ namespace Engine {
 		WindowProps props;
 		//OrthographicCameraComponent m_Camera;
 
+
 		sf::Sprite sprites[4];
 		sf::Texture texture1;
 
@@ -49,6 +54,9 @@ namespace Engine {
 		Entity* PrimaryCamera;// = m_Camera;
 
 		bool camera1 = false;
+		bool m_SceneIsFocused = false;
+
+		SceneHierarchyPanel m_Panel;
 	};
 
 }

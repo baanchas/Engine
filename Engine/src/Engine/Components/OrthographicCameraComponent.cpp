@@ -20,7 +20,7 @@ namespace Engine {
 
 	void OrthographicCameraComponent::OnEvent(sf::Event& event)
 	{
-	
+
 		if (event.type == sf::Event::MouseWheelMoved)
 		{
 			if (event.mouseWheel.delta == 1)
@@ -67,30 +67,28 @@ namespace Engine {
 
 	void OrthographicCameraComponent::OnUpdate(float& ts)
 	{
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-			m_View.move(-speed, 0.0f);
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-			m_View.move(+speed, 0.0f);
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-			m_View.move(0.0f, -speed);
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-			m_View.move(0.0f, +speed);
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Home))
-			m_View.rotate(3.0f);
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
-			m_View.rotate(-3.0f);
-
-
-	 	m_oldCenter = m_View.getCenter();
+		m_oldCenter = m_View.getCenter();
 	}
 
 
 	void OrthographicCameraComponent::SetSize(float x, float y)
 	{
 		m_View.setSize(x, y);
+	}
+
+	void OrthographicCameraComponent::SetCenter(float x, float y)
+	{
+		m_View.setCenter(x, y);
+	}
+
+	void OrthographicCameraComponent::SetCenter(sf::Vector2f vec)
+	{
+		m_View.setCenter(vec);
+	}
+
+	void OrthographicCameraComponent::SetRotation(float r)
+	{
+		m_View.setRotation(r);
 	}
 
 	void OrthographicCameraComponent::ZoomIn()

@@ -15,7 +15,7 @@ namespace Engine {
 		Scene();
 		~Scene();
 
-		Entity CreateEntity();
+		Entity CreateEntity(std::string name);
 
 		void OnUpdate(float& ts);
 		void Render(sf::RenderTarget& rt);
@@ -25,6 +25,7 @@ namespace Engine {
 		entt::registry m_Registry;
 
 		friend class Entity;
+		friend class SceneHierarchyPanel;
 	};
 
 }

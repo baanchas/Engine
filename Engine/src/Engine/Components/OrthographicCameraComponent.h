@@ -15,6 +15,11 @@ namespace Engine {
 
 		void SetSize(float x, float y);
 
+		void SetCenter(float x, float y);
+		void SetCenter(sf::Vector2f vec);
+
+		void SetRotation(float r);
+
 		void ZoomIn();
 		void ZoomOut();
 

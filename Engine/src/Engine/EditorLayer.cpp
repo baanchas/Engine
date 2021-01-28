@@ -12,18 +12,18 @@ namespace Engine {
 
 		m_ActiveScene = new Scene();
 		
-		entt = m_ActiveScene->CreateEntity();
-		entity = m_ActiveScene->CreateEntity();
-		m_Camera = m_ActiveScene->CreateEntity();
-		m_SecondCamera = m_ActiveScene->CreateEntity();
+		entt = m_ActiveScene->CreateEntity("Cube 1");
+		entity = m_ActiveScene->CreateEntity("Cube 2");
+		m_Camera = m_ActiveScene->CreateEntity("Camera 1");
+		m_SecondCamera = m_ActiveScene->CreateEntity("Camera 2");
 
 		PrimaryCamera = &m_Camera;
 
 		m_Camera.AddComponent<CameraComponent>();
 		
+		
 		m_SecondCamera.AddComponent<CameraComponent>();
-		
-		
+				
 		entity.AddComponent<RectangleCOmponent>(sf::Vector2f(100, 100));
 		auto& rc1 = entity.GetComponent<RectangleCOmponent>();
 		rc1.SetOrigin();
@@ -49,6 +49,8 @@ namespace Engine {
 		}
 
 		ENGINE_INFO("{0} entities in ActiveScene", m_ActiveScene->Count());
+
+		m_Panel.SetContext(m_ActiveScene);
 	}
 
 	EditorLayer::~EditorLayer()
@@ -60,10 +62,10 @@ namespace Engine {
 
 	void EditorLayer::OnEvent(sf::Event& event)
 	{
-		if (PrimaryCamera->HasComponent<CameraComponent>())
+		if (PrimaryCamera->HasComponent<CameraComponent>() && m_SceneIsFocused)
 		{
-			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
-			camera.Camera.OnEvent(event);
+			auto& cc = PrimaryCamera->GetComponent<CameraComponent>();
+			cc.Camera.OnEvent(event);
 		}
 	}
 
@@ -94,28 +96,47 @@ namespace Engine {
 		auto& rc = entt.GetComponent<RectangleCOmponent>();
 		rc.rect.rotate(40 * ts);
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			auto& tc =entt.GetComponent<TransformComponent>();
-			tc.Position += sf::Vector2f(100, 0) * -ts;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+
+		if (m_SceneIsFocused)
 		{
 			auto& tc = entt.GetComponent<TransformComponent>();
-			tc.Position += sf::Vector2f(100, 0) * ts;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				tc.Position += sf::Vector2f(100, 0) * -ts;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				tc.Position += sf::Vector2f(100, 0) * ts;
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			{
+				tc.Position += sf::Vector2f(0, 100) * -ts;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				tc.Position += sf::Vector2f(0, 100) * ts;
+			}
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (m_SceneIsFocused)
 		{
-			auto& tc = entt.GetComponent<TransformComponent>();
-			tc.Position += sf::Vector2f(0, 100) * -ts;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			auto& tc = entt.GetComponent<TransformComponent>();
-			tc.Position += sf::Vector2f(0, 100) * ts;
-		}
+			auto& cctc = PrimaryCamera->GetComponent<TransformComponent>();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+				cctc.Position += sf::Vector2f(-10.f, 0.0f);
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+				cctc.Position += sf::Vector2f(10.f, 0.0f);
 
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+				cctc.Position += sf::Vector2f(0.f, -10.0f);
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+				cctc.Position += sf::Vector2f(0.f, +10.0f);
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Home))
+				cctc.Rotation += 3.0f;
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
+				cctc.Rotation -= 3.0f;
+		}
 	}
 
 	void EditorLayer::Render(sf::RenderTarget& rt)
@@ -191,12 +212,17 @@ namespace Engine {
 		ImGui::Begin("Scene");
 		ImGui::PopStyleVar();
 
-
 		ImVec2 AvailableContentSize = ImGui::GetContentRegionAvail();
 
 		sf::RenderTexture renderTarget;
 		renderTarget.create((unsigned int)AvailableContentSize.x, (unsigned int)AvailableContentSize.y);
 		renderTarget.clear();
+
+		if (ImGui::IsWindowFocused() || ImGui::IsWindowHovered())
+			m_SceneIsFocused = true;
+		else
+			m_SceneIsFocused = false;
+
 
 		if (PrimaryCamera->HasComponent<CameraComponent>())
 		{
@@ -212,6 +238,8 @@ namespace Engine {
 		ImGui::Image(renderTarget.getTexture(), sf::Vector2f(AvailableContentSize.x, AvailableContentSize.y), sf::FloatRect(0, 0, AvailableContentSize.x, AvailableContentSize.y));
 
 		ImGui::End();
+
+		m_Panel.OnImGuiRender();
 
 		ImGui::SFML::Render(*Application::Get()->mp_Window->m_Window);
 
