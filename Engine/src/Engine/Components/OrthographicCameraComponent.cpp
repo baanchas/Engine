@@ -67,6 +67,7 @@ namespace Engine {
 
 	void OrthographicCameraComponent::OnUpdate(float& ts)
 	{
+		// TEMP
 		m_oldCenter = m_View.getCenter();
 	}
 

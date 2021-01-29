@@ -14,7 +14,6 @@ namespace Engine {
 		Log::InitLog();
 
 		PushLayer(new EditorLayer());
-		PushOverlay(new ImGuiLayer());
 	}
 
 	void Application::Run()
@@ -26,6 +25,7 @@ namespace Engine {
 			OnUpdate();
 			Render();
 		}
+		ImGui::SFML::Shutdown();
 	}
 
 	void Application::OnEvent(sf::Event& event)
@@ -34,6 +34,8 @@ namespace Engine {
 		{
 			if (m_Event.type == sf::Event::Closed)
 				mp_Window->m_Window->close();
+
+			ImGui::SFML::ProcessEvent(event);
 
 			if (m_LayerStack.GetSize() != 0)
 			{
@@ -45,6 +47,8 @@ namespace Engine {
 
 	void Application::OnUpdate()
 	{
+		ImGui::SFML::Update(*Application::Get()->mp_Window->m_Window, Application::Get()->GetTime().restart());
+
 		if (m_LayerStack.GetSize() != 0)
 		{
 			for (Layer* layer : m_LayerStack)

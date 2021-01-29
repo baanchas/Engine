@@ -36,8 +36,6 @@ namespace Engine {
 		Scene* m_ActiveScene;
 
 		WindowProps props;
-		//OrthographicCameraComponent m_Camera;
-
 
 		sf::Sprite sprites[4];
 		sf::Texture texture1;

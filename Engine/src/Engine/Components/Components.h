@@ -3,8 +3,12 @@
 #include "enpch.h"
 
 #include "OrthographicCameraComponent.h"
+#include "Engine/Objects/ScriptableEntity.h"
+//#include <functional>
 
 namespace Engine {
+
+
 
 	struct Component
 	{
@@ -99,7 +103,7 @@ namespace Engine {
 		sf::Texture Texture;
 		sf::Sprite Sprite;
 		sf::Vector2u Size = Texture.getSize();
-		//SpriteComponent() = default;
+		
 		SpriteComponent(const SpriteComponent&) = default;
 		SpriteComponent(sf::Sprite sprite)
 			: Sprite(sprite) {}
@@ -128,6 +132,26 @@ namespace Engine {
 		bool primary = false;
 
 		CameraComponent() {};
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		
+
+		ScriptableEntity*(*InstantiateFunction)();
+		void (*DestroyInstanceFunction)(NativeScriptComponent*);
+
+
+		template<typename T>
+		void Bind()
+		{
+			InstantiateFunction = []() { return static_cast<ScriptableEntity*>(new T()); };
+			DestroyInstanceFunction = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+
+
+		}
 	};
 }
 

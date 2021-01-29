@@ -1,10 +1,5 @@
 #pragma once
 
-#include "Engine/Components/Components.h"
-
-
-#include "entt.hpp"
-
 namespace Engine {
 
 	class Entity;
@@ -19,6 +14,8 @@ namespace Engine {
 
 		void OnUpdate(float& ts);
 		void Render(sf::RenderTarget& rt);
+
+		void OnScenePLay(float ts);
 
 		inline size_t Count() const { return m_Registry.size(); }
 	private:

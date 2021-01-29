@@ -1,6 +1,6 @@
 #include "enpch.h"
 #include "Scene.h"
-
+#include "Engine/Components/Components.h"
 
 #include "Entity.h"
 
@@ -18,6 +18,19 @@ namespace Engine {
 
 	void Scene::OnUpdate(float& ts)
 	{
+		{
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+			{
+				if (!nsc.Instance)
+				{
+					nsc.Instance = nsc.InstantiateFunction();
+					nsc.Instance->m_Entity = Entity{ entity, this };
+					nsc.Instance->OnCreate();
+				}
+				//if ()
+				nsc.Instance->OnUpdate(ts);
+			});
+		}
 
 		auto viewRCTC = m_Registry.view<RectangleCOmponent, TransformComponent>();
 		for (auto entity : viewRCTC)
@@ -52,6 +65,11 @@ namespace Engine {
 			cc.Camera.SetCenter(tc.Position);
 			cc.Camera.SetRotation(tc.Rotation);
 		}
+	}
+
+	void Scene::OnScenePLay(float ts)
+	{
+
 	}
 
 	void Scene::Render(sf::RenderTarget& rt)

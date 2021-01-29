@@ -130,6 +130,7 @@
     <ClInclude Include="src\Engine\Objects\Entity.h" />
     <ClInclude Include="src\Engine\Objects\Scene.h" />
     <ClInclude Include="src\Engine\Objects\SceneHierarchyPanel.h" />
+    <ClInclude Include="src\Engine\Objects\ScriptableEntity.h" />
     <ClInclude Include="src\Engine\Objects\Shapes\Rectangle.h" />
     <ClInclude Include="src\enpch.h" />
     <ClInclude Include="src\Engine\Graphics\window.h" />

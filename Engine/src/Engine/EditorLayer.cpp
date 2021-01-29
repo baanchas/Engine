@@ -1,6 +1,7 @@
 #include "enpch.h"
 #include "EditorLayer.h"
 #include "Engine/Application.h"
+#include <functional>
 
 namespace Engine {
 
@@ -12,18 +13,21 @@ namespace Engine {
 
 		m_ActiveScene = new Scene();
 		
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+
 		entt = m_ActiveScene->CreateEntity("Cube 1");
 		entity = m_ActiveScene->CreateEntity("Cube 2");
 		m_Camera = m_ActiveScene->CreateEntity("Camera 1");
 		m_SecondCamera = m_ActiveScene->CreateEntity("Camera 2");
 
-		PrimaryCamera = &m_Camera;
 
 		m_Camera.AddComponent<CameraComponent>();
 		
-		
 		m_SecondCamera.AddComponent<CameraComponent>();
-				
+		
+		PrimaryCamera = &m_Camera;
+		
+		// Setup enttities
 		entity.AddComponent<RectangleCOmponent>(sf::Vector2f(100, 100));
 		auto& rc1 = entity.GetComponent<RectangleCOmponent>();
 		rc1.SetOrigin();
@@ -37,6 +41,7 @@ namespace Engine {
 		tc.Position = sf::Vector2f(400, 400);
 		entt.AddComponent<ColorComponent>();
 
+		// TEMP
 		texture1.loadFromFile("resources/sprites/checkerboard.png");
 		for (int i = 0; i < 4; i++)
 		{
@@ -49,6 +54,42 @@ namespace Engine {
 		}
 
 		ENGINE_INFO("{0} entities in ActiveScene", m_ActiveScene->Count());
+
+
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+			
+			}
+
+			void OnDestroy()
+			{
+			}
+
+			void OnUpdate(float ts)
+			{
+				auto& cctc = GetComponent<TransformComponent>();
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+					cctc.Position += sf::Vector2f(-10.f, 0.0f);
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+					cctc.Position += sf::Vector2f(10.f, 0.0f);
+
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+					cctc.Position += sf::Vector2f(0.f, -10.0f);
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+					cctc.Position += sf::Vector2f(0.f, +10.0f);
+
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Home))
+					cctc.Rotation += 3.0f;
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
+					cctc.Rotation -= 3.0f;
+			}
+		};
+
+		//m_Camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		//m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_Panel.SetContext(m_ActiveScene);
 	}
@@ -71,6 +112,7 @@ namespace Engine {
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
+		// 
 		if (camera1)
 		{
 			PrimaryCamera = &m_SecondCamera;
@@ -80,8 +122,13 @@ namespace Engine {
 			PrimaryCamera = &m_Camera;
 		}
 
-		m_ActiveScene->OnUpdate(ts);
+		// Updating Scene stuff only when cnene window is active
+		if (m_SceneIsFocused)
+		{
+			m_ActiveScene->OnScenePLay(ts);
+		}
 
+		m_ActiveScene->OnUpdate(ts);
 
 		if (PrimaryCamera->HasComponent<CameraComponent>())
 		{
@@ -89,7 +136,7 @@ namespace Engine {
 			camera.Camera.OnUpdate(ts);
 		}
 
-
+		
 		auto& cc = entt.GetComponent<ColorComponent>();
 		cc.Color = sf::Color((sf::Uint8)(colors[0] * 255), (sf::Uint8)(colors[1] * 255), (sf::Uint8)(colors[2] * 255));
 
@@ -119,6 +166,7 @@ namespace Engine {
 			}
 		}
 
+
 		if (m_SceneIsFocused)
 		{
 			auto& cctc = PrimaryCamera->GetComponent<TransformComponent>();
@@ -146,11 +194,13 @@ namespace Engine {
 
 	void EditorLayer::RenderFrameBuffer(sf::RenderTarget& rt)
 	{
+		// draw wallpaper
 		for (auto& sprite : sprites)
 		{
 			rt.draw(sprite);
 		}
 
+		// Rendering Scene entities
 		m_ActiveScene->Render(rt);
 	}
 
@@ -203,7 +253,7 @@ namespace Engine {
 
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit3("Change Color", colors, ImGuiColorEditFlags_InputRGB);
-		if (ImGui::Checkbox("Camera 2", &camera1));
+		ImGui::Checkbox("Camera 2", &camera1);
 
 		ImGui::End();
 
@@ -212,18 +262,19 @@ namespace Engine {
 		ImGui::Begin("Scene");
 		ImGui::PopStyleVar();
 
-		ImVec2 AvailableContentSize = ImGui::GetContentRegionAvail();
-
-		sf::RenderTexture renderTarget;
-		renderTarget.create((unsigned int)AvailableContentSize.x, (unsigned int)AvailableContentSize.y);
-		renderTarget.clear();
-
+		// Check if scene is foucesd
 		if (ImGui::IsWindowFocused() || ImGui::IsWindowHovered())
 			m_SceneIsFocused = true;
 		else
 			m_SceneIsFocused = false;
 
+		ImVec2 AvailableContentSize = ImGui::GetContentRegionAvail();
+		// Setting frame buffer
+		sf::RenderTexture renderTarget;
+		renderTarget.create((unsigned int)AvailableContentSize.x, (unsigned int)AvailableContentSize.y);
+		renderTarget.clear();
 
+		// Calculate Camera view
 		if (PrimaryCamera->HasComponent<CameraComponent>())
 		{
 			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
@@ -239,6 +290,7 @@ namespace Engine {
 
 		ImGui::End();
 
+		// Draw Hierarchy Panel
 		m_Panel.OnImGuiRender();
 
 		ImGui::SFML::Render(*Application::Get()->mp_Window->m_Window);

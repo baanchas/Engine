@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <functional>
 
 //------- Input -------------------
 
@@ -31,3 +32,6 @@
 #include "imgui-sfml.h"
 
 //------- EnTT --------------------
+
+#include "entt.hpp"
+

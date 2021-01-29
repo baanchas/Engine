@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+//#include <functional>
 
 namespace Engine {
 
@@ -9,8 +10,8 @@ namespace Engine {
 	public:
 		Entity() = default;
 		Entity(const Entity& other) = default;
-		//Entity(const Entity& other) = default;
 		Entity(entt::entity id, Scene* scene);
+
 		virtual ~Entity();
 
 		virtual void Render(sf::RenderTarget& rt) {}
@@ -47,11 +48,21 @@ namespace Engine {
 		operator bool() const { return (int)m_EntityId != 0; }
 
 		operator uint32_t() const { return (uint32_t)m_EntityId; };
+		operator entt::entity() const { return m_EntityId; };
 
+
+		bool operator==(const Entity& other) const
+		{
+			return m_EntityId == other.m_EntityId && m_Scene == other.m_Scene;
+		}
+
+		bool operator!=(const Entity& other) const
+		{
+			return !(*this == other);
+		}
 	private:
 		Scene* m_Scene = nullptr;
 		entt::entity m_EntityId{ entt::null };
 		std::string m_Name;
 	};
-
 }
