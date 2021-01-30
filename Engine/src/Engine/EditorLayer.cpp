@@ -109,6 +109,8 @@ namespace Engine {
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
+		ENGINE_INFO("{0} {1}", Input::GetMouseX(), Input::GetMouseY())
+
 		// 
 		if (camera1)
 		{
