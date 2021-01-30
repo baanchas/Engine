@@ -26,8 +26,18 @@ namespace Engine {
 		{
 			Entity entity{ entityID, m_Context };
 			auto& tc = entity.GetComponent<TagComponent>();
-			ImGui::Text("%s", tc.Tag.c_str());
+			ImGuiTreeNodeFlags flags = ((m_Selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+			//ImGui::Text("%s", tc.Tag.c_str());
+			bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tc.Tag.c_str());
+
+			if (ImGui::IsItemClicked())
+			{
+				m_Selected = entity;
+			}
+
 		});
+
+		//ImGui::ShowDemoWindow();
 		//ImGui::ShowDemoWindow();
 		ImGui::End();
 	}

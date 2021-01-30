@@ -20,7 +20,7 @@ namespace Engine {
 
 	private:
 		Scene* m_Context;
-
+		Entity m_Selected;
 		friend class Scene;
 	};
 

@@ -71,25 +71,22 @@ namespace Engine {
 			void OnUpdate(float ts)
 			{
 				auto& cctc = GetComponent<TransformComponent>();
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+				if (Input::IsKeyPressed(Codes::Keyboard::Left))
 					cctc.Position += sf::Vector2f(-10.f, 0.0f);
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+				else if (Input::IsKeyPressed(Codes::Keyboard::Right))
 					cctc.Position += sf::Vector2f(10.f, 0.0f);
 
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+				if (Input::IsKeyPressed(Codes::Keyboard::Up))
 					cctc.Position += sf::Vector2f(0.f, -10.0f);
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+				else if (Input::IsKeyPressed(Codes::Keyboard::Down))
 					cctc.Position += sf::Vector2f(0.f, +10.0f);
 
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Home))
+				if (Input::IsKeyPressed(Codes::Keyboard::Home))
 					cctc.Rotation += 3.0f;
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
+				else if (Input::IsKeyPressed(Codes::Keyboard::End))
 					cctc.Rotation -= 3.0f;
 			}
 		};
-
-		//m_Camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-		//m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_Panel.SetContext(m_ActiveScene);
 	}
@@ -127,8 +124,9 @@ namespace Engine {
 		{
 			m_ActiveScene->OnScenePLay(ts);
 		}
-
+		
 		m_ActiveScene->OnUpdate(ts);
+
 
 		if (PrimaryCamera->HasComponent<CameraComponent>())
 		{
@@ -147,20 +145,20 @@ namespace Engine {
 		if (m_SceneIsFocused)
 		{
 			auto& tc = entt.GetComponent<TransformComponent>();
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			if (Input::IsKeyPressed(Codes::Keyboard::A))
 			{
 				tc.Position += sf::Vector2f(100, 0) * -ts;
 			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			else if (Input::IsKeyPressed(Codes::Keyboard::D))
 			{
 				tc.Position += sf::Vector2f(100, 0) * ts;
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			if (Input::IsKeyPressed(Codes::Keyboard::W))
 			{
 				tc.Position += sf::Vector2f(0, 100) * -ts;
 			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			else if (Input::IsKeyPressed(Codes::Keyboard::S))
 			{
 				tc.Position += sf::Vector2f(0, 100) * ts;
 			}
@@ -170,19 +168,19 @@ namespace Engine {
 		if (m_SceneIsFocused)
 		{
 			auto& cctc = PrimaryCamera->GetComponent<TransformComponent>();
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+			if (Input::IsKeyPressed(Codes::Keyboard::Left))
 				cctc.Position += sf::Vector2f(-10.f, 0.0f);
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+			else if (Input::IsKeyPressed(Codes::Keyboard::Right))
 				cctc.Position += sf::Vector2f(10.f, 0.0f);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+			if (Input::IsKeyPressed(Codes::Keyboard::Up))
 				cctc.Position += sf::Vector2f(0.f, -10.0f);
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+			else if (Input::IsKeyPressed(Codes::Keyboard::Down))
 				cctc.Position += sf::Vector2f(0.f, +10.0f);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Home))
+			if (Input::IsKeyPressed(Codes::Keyboard::Home))
 				cctc.Rotation += 3.0f;
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End))
+			else if (Input::IsKeyPressed(Codes::Keyboard::End))
 				cctc.Rotation -= 3.0f;
 		}
 	}
