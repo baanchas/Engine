@@ -20,6 +20,11 @@ namespace Engine {
 		return { sf::Mouse::getPosition().x, sf::Mouse::getPosition().y };
 	}
 
+	std::pair<float, float> Input::GetMousePosition(Window* window)
+	{
+		return { sf::Mouse::getPosition(*window->m_Window).x,  sf::Mouse::getPosition(*window->m_Window).y };
+	}
+
 	float Input::GetMouseX()
 	{
 		return sf::Mouse::getPosition().x;
@@ -28,6 +33,16 @@ namespace Engine {
 	float Input::GetMouseY()
 	{
 		return sf::Mouse::getPosition().y;
+	}
+
+	float Input::GetMouseX(Window* window)
+	{
+		return sf::Mouse::getPosition(*window->m_Window).x;
+	}
+
+	float Input::GetMouseY(Window* window)
+	{
+		return sf::Mouse::getPosition(*window->m_Window).y;
 	}
 
 }

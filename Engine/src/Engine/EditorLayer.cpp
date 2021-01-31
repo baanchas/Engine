@@ -109,7 +109,7 @@ namespace Engine {
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
-		ENGINE_INFO("{0} {1}", Input::GetMouseX(), Input::GetMouseY())
+		//ENGINE_INFO("{0} {1}", Input::GetMouseX(Application::Get()->mp_Window), Input::GetMouseY(Application::Get()->mp_Window))
 
 		// 
 		if (camera1)
@@ -136,12 +136,10 @@ namespace Engine {
 			camera.Camera.OnUpdate(ts);
 		}
 
-		
-		auto& cc = entt.GetComponent<ColorComponent>();
-		cc.Color = sf::Color((sf::Uint8)(colors[0] * 255), (sf::Uint8)(colors[1] * 255), (sf::Uint8)(colors[2] * 255));
 
-		auto& rc = entt.GetComponent<RectangleCOmponent>();
-		rc.rect.rotate(40 * ts);
+		auto& rc = entt.GetComponent<TransformComponent>();
+		rc.Rotation += 40 * ts;
+		//rc.rect.setRotation(40 * ts);
 
 
 		if (m_SceneIsFocused)
@@ -220,11 +218,12 @@ namespace Engine {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		// DockSpace
 		ImGui::Begin("DockSpace Demo", &dockspaceOpen, Windowflags);
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar(2);
 
-		// DockSpace
 
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -252,7 +251,8 @@ namespace Engine {
 
 
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit3("Change Color", colors, ImGuiColorEditFlags_InputRGB);
+		//ImGui::setnexwindo
+
 		ImGui::Checkbox("Camera 2", &camera1);
 
 		ImGui::End();

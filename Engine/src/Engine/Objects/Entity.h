@@ -45,7 +45,7 @@ namespace Engine {
 			m_Scene->m_Registry.remove<T>(m_EntityId);
 		}
 
-		operator bool() const { return (int)m_EntityId != 0; }
+		operator bool() const { return m_EntityId != entt::null; }
 
 		operator uint32_t() const { return (uint32_t)m_EntityId; };
 		operator entt::entity() const { return m_EntityId; };

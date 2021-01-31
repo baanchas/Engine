@@ -4,16 +4,10 @@
 
 #include "OrthographicCameraComponent.h"
 #include "Engine/Objects/ScriptableEntity.h"
-//#include <functional>
+
 
 namespace Engine {
 
-
-
-	struct Component
-	{
-		std::string m_Name;
-	};
 
 	struct TagComponent
 	{
@@ -61,12 +55,13 @@ namespace Engine {
 
 
 		operator sf::Vector2f& () { return Position; }
+		operator float () { return Position.x, Position.y; }
 		operator const sf::Vector2f& () { return Position; }
 	};
 
 	struct ColorComponent
 	{
-		sf::Color Color = sf::Color(0, 0, 0);
+		sf::Color Color = sf::Color(0, 0 ,0);
 
 		ColorComponent() = default;
 		ColorComponent(const ColorComponent&) = default;
@@ -79,7 +74,9 @@ namespace Engine {
 
 	struct RectangleCOmponent
 	{
-		sf::RectangleShape rect = sf::RectangleShape(sf::Vector2f(100, 100));
+		sf::Vector2f Size = sf::Vector2f(100, 100);
+
+		sf::RectangleShape rect = sf::RectangleShape(Size);
 
 
 		RectangleCOmponent() = default;
@@ -91,7 +88,7 @@ namespace Engine {
 
 		void SetOrigin()
 		{
-			rect.setOrigin(rect.getSize().x / 2, rect.getSize().y / 2);
+			rect.setOrigin(Size.x / 2, Size.y / 2);
 		}
 
 		operator sf::RectangleShape& () { return rect; }

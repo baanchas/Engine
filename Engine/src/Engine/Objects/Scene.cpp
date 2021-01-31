@@ -32,6 +32,15 @@ namespace Engine {
 			});
 		}
 
+		auto viewRC = m_Registry.view<RectangleCOmponent>();
+		for (auto entity : viewRC)
+		{
+			RectangleCOmponent& rc = m_Registry.get<RectangleCOmponent>(entity);
+
+			rc.rect.setSize(rc.Size);
+			rc.SetOrigin();
+		}
+
 		auto viewRCTC = m_Registry.view<RectangleCOmponent, TransformComponent>();
 		for (auto entity : viewRCTC)
 		{
@@ -40,6 +49,7 @@ namespace Engine {
 
 			rc.rect.setScale(tc.Scale);
 			rc.rect.setPosition(tc.GetPosition());
+			rc.rect.setRotation(tc.Rotation);
 
 			if (m_Registry.has<ColorComponent>(entity))
 			{

@@ -18,9 +18,13 @@ namespace Engine {
 
 		void OnImGuiRender();
 
+		void DrawComponents(Entity& entity);
+
 	private:
+		float colorBuffer[3];
+
 		Scene* m_Context;
-		Entity m_Selected;
+		Entity m_SelectedEntity;
 		friend class Scene;
 	};
 
