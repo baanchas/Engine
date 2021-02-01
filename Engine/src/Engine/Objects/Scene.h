@@ -10,12 +10,16 @@ namespace Engine {
 		Scene();
 		~Scene();
 
-		Entity CreateEntity(std::string name);
-
 		void OnUpdate(float& ts);
 		void Render(sf::RenderTarget& rt);
 
+		Entity CreateEntity(std::string name);
+		void DestroyEntity(Entity& entity);
+
 		void OnScenePLay(float ts);
+
+		template<typename T>
+		bool OnComponentAdded(Entity entity, T& component);
 
 		inline size_t Count() const { return m_Registry.size(); }
 	private:

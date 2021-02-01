@@ -33,6 +33,7 @@ namespace Engine {
 		rc1.SetOrigin();
 		auto& tc1 = entity.GetComponent<TransformComponent>();
 		tc1.Position = sf::Vector2f(1000, 200);
+		entity.AddComponent<ColorComponent>();
 
 		entt.AddComponent<RectangleCOmponent>(sf::Vector2f(200, 200));
 		auto& rc = entt.GetComponent<RectangleCOmponent>();
@@ -71,19 +72,19 @@ namespace Engine {
 			void OnUpdate(float ts)
 			{
 				auto& cctc = GetComponent<TransformComponent>();
-				if (Input::IsKeyPressed(Codes::Keyboard::Left))
+				if (Input::IsKeyPressed(KeyCodes::Keyboard::Left))
 					cctc.Position += sf::Vector2f(-10.f, 0.0f);
-				else if (Input::IsKeyPressed(Codes::Keyboard::Right))
+				else if (Input::IsKeyPressed(KeyCodes::Keyboard::Right))
 					cctc.Position += sf::Vector2f(10.f, 0.0f);
 
-				if (Input::IsKeyPressed(Codes::Keyboard::Up))
+				if (Input::IsKeyPressed(KeyCodes::Keyboard::Up))
 					cctc.Position += sf::Vector2f(0.f, -10.0f);
-				else if (Input::IsKeyPressed(Codes::Keyboard::Down))
+				else if (Input::IsKeyPressed(KeyCodes::Keyboard::Down))
 					cctc.Position += sf::Vector2f(0.f, +10.0f);
 
-				if (Input::IsKeyPressed(Codes::Keyboard::Home))
+				if (Input::IsKeyPressed(KeyCodes::Keyboard::Home))
 					cctc.Rotation += 3.0f;
-				else if (Input::IsKeyPressed(Codes::Keyboard::End))
+				else if (Input::IsKeyPressed(KeyCodes::Keyboard::End))
 					cctc.Rotation -= 3.0f;
 			}
 		};
@@ -100,27 +101,29 @@ namespace Engine {
 
 	void EditorLayer::OnEvent(sf::Event& event)
 	{
-		if (PrimaryCamera->HasComponent<CameraComponent>() && m_SceneIsFocused)
+		if (PrimaryCamera->Valid())
 		{
-			auto& cc = PrimaryCamera->GetComponent<CameraComponent>();
-			cc.Camera.OnEvent(event);
+			if (PrimaryCamera->HasComponent<CameraComponent>() && m_SceneIsFocused)
+			{
+				auto& cc = PrimaryCamera->GetComponent<CameraComponent>();
+				cc.Camera.OnEvent(event);
+			}
 		}
 	}
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
-		//ENGINE_INFO("{0} {1}", Input::GetMouseX(Application::Get()->mp_Window), Input::GetMouseY(Application::Get()->mp_Window))
-
-		// 
 		if (camera1)
 		{
-			PrimaryCamera = &m_SecondCamera;
+			if (m_SecondCamera.Valid())
+				PrimaryCamera = &m_SecondCamera;
 		}
 		else
 		{
-			PrimaryCamera = &m_Camera;
+			if (m_Camera.Valid())
+				PrimaryCamera = &m_Camera;
 		}
-
+		
 		// Updating Scene stuff only when cnene window is active
 		if (m_SceneIsFocused)
 		{
@@ -129,58 +132,64 @@ namespace Engine {
 		
 		m_ActiveScene->OnUpdate(ts);
 
-
-		if (PrimaryCamera->HasComponent<CameraComponent>())
+		if (PrimaryCamera->Valid())
 		{
-			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
-			camera.Camera.OnUpdate(ts);
+			if (PrimaryCamera->HasComponent<CameraComponent>())
+			{
+				auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
+				camera.Camera.OnUpdate(ts);
+			}
 		}
 
-
-		auto& rc = entt.GetComponent<TransformComponent>();
-		rc.Rotation += 40 * ts;
+		if (entt.Valid())
+		{
+			auto& rc = entt.GetComponent<TransformComponent>();
+			rc.Rotation += 40 * ts;
+		}
 		//rc.rect.setRotation(40 * ts);
 
-
-		if (m_SceneIsFocused)
+		if (m_SceneIsFocused && entt.Valid())
 		{
-			auto& tc = entt.GetComponent<TransformComponent>();
-			if (Input::IsKeyPressed(Codes::Keyboard::A))
+			if (entt.HasComponent<TransformComponent>())
 			{
-				tc.Position += sf::Vector2f(100, 0) * -ts;
-			}
-			else if (Input::IsKeyPressed(Codes::Keyboard::D))
-			{
-				tc.Position += sf::Vector2f(100, 0) * ts;
-			}
+				auto& tc = entt.GetComponent<TransformComponent>();
+				if (Input::IsKeyPressed(KeyCodes::Keyboard::A))
+				{
+					tc.Position += sf::Vector2f(100, 0) * -ts;
+				}
+				else if (Input::IsKeyPressed(KeyCodes::Keyboard::D))
+				{
+					tc.Position += sf::Vector2f(100, 0) * ts;
+				}
 
-			if (Input::IsKeyPressed(Codes::Keyboard::W))
-			{
-				tc.Position += sf::Vector2f(0, 100) * -ts;
-			}
-			else if (Input::IsKeyPressed(Codes::Keyboard::S))
-			{
-				tc.Position += sf::Vector2f(0, 100) * ts;
+				if (Input::IsKeyPressed(KeyCodes::Keyboard::W))
+				{
+					tc.Position += sf::Vector2f(0, 100) * -ts;
+				}
+				else if (Input::IsKeyPressed(KeyCodes::Keyboard::S))
+				{
+					tc.Position += sf::Vector2f(0, 100) * ts;
+				}
 			}
 		}
 
 
-		if (m_SceneIsFocused)
+		if (m_SceneIsFocused && PrimaryCamera->Valid())
 		{
 			auto& cctc = PrimaryCamera->GetComponent<TransformComponent>();
-			if (Input::IsKeyPressed(Codes::Keyboard::Left))
+			if (Input::IsKeyPressed(KeyCodes::Keyboard::Left))
 				cctc.Position += sf::Vector2f(-10.f, 0.0f);
-			else if (Input::IsKeyPressed(Codes::Keyboard::Right))
+			else if (Input::IsKeyPressed(KeyCodes::Keyboard::Right))
 				cctc.Position += sf::Vector2f(10.f, 0.0f);
 
-			if (Input::IsKeyPressed(Codes::Keyboard::Up))
+			if (Input::IsKeyPressed(KeyCodes::Keyboard::Up))
 				cctc.Position += sf::Vector2f(0.f, -10.0f);
-			else if (Input::IsKeyPressed(Codes::Keyboard::Down))
+			else if (Input::IsKeyPressed(KeyCodes::Keyboard::Down))
 				cctc.Position += sf::Vector2f(0.f, +10.0f);
 
-			if (Input::IsKeyPressed(Codes::Keyboard::Home))
+			if (Input::IsKeyPressed(KeyCodes::Keyboard::Home))
 				cctc.Rotation += 3.0f;
-			else if (Input::IsKeyPressed(Codes::Keyboard::End))
+			else if (Input::IsKeyPressed(KeyCodes::Keyboard::End))
 				cctc.Rotation -= 3.0f;
 		}
 	}
@@ -275,15 +284,16 @@ namespace Engine {
 		renderTarget.clear();
 
 		// Calculate Camera view
-		if (PrimaryCamera->HasComponent<CameraComponent>())
+		if (PrimaryCamera->Valid())
 		{
-			auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
-			renderTarget.setView(camera.Camera.m_View);
-
-			camera.Camera.CalculateView(AvailableContentSize.x, AvailableContentSize.y);
+			if (PrimaryCamera->HasComponent<CameraComponent>())
+			{
+				auto& camera = PrimaryCamera->GetComponent<CameraComponent>();
+				renderTarget.setView(camera.Camera.m_View);
+				camera.Camera.CalculateView(AvailableContentSize.x, AvailableContentSize.y);
+				RenderFrameBuffer(renderTarget);
+			}
 		}
-
-		RenderFrameBuffer(renderTarget);
 		renderTarget.display();
 
 		ImGui::Image(renderTarget.getTexture(), sf::Vector2f(AvailableContentSize.x, AvailableContentSize.y), sf::FloatRect(0, 0, AvailableContentSize.x, AvailableContentSize.y));

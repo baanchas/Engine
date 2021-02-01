@@ -34,27 +34,27 @@ namespace Engine {
 	private:
 		sf::RenderTexture* m_RenderTexture;
 		Scene* m_ActiveScene;
+		Entity* PrimaryCamera;// = m_Camera;
 
 		WindowProps props;
 
-		sf::Sprite sprites[4];
-		sf::Texture texture1;
-
-		float colors[3] = { 0.0f, 0.0f, 0.0f, };
-		sf::Color m_color;
-
 		TransformComponent tc;
 
+		SceneHierarchyPanel m_Panel;
+
+		// TEMP
 		Entity entt;
 		Entity entity;
 		Entity m_Camera;
 		Entity m_SecondCamera;
-		Entity* PrimaryCamera;// = m_Camera;
 
+		sf::Sprite sprites[4];
+		sf::Texture texture1;
 		bool camera1 = false;
 		bool m_SceneIsFocused = false;
 
-		SceneHierarchyPanel m_Panel;
+		float colors[3] = { 0.0f, 0.0f, 0.0f, };
+		sf::Color m_color;
 	};
 
 }

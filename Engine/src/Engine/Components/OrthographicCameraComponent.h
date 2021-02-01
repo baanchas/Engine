@@ -28,14 +28,15 @@ namespace Engine {
 		void CalculateView(float x, float y);
 		void CalculateView(sf::Vector2f vec);
 
+		float GetZoom() { return m_zoomLevel; }
 
 	public:
 		sf::View m_View;
+		float m_zoomLevel = 1.0f;
 
 	private:
 		sf::Vector2f m_oldCenter = m_View.getCenter();
 
-		float m_zoomLevel = 1.0f;
 		float speed = 10.0f;
 	};
 

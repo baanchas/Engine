@@ -146,8 +146,6 @@ namespace Engine {
 		{
 			InstantiateFunction = []() { return static_cast<ScriptableEntity*>(new T()); };
 			DestroyInstanceFunction = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
-
-
 		}
 	};
 }

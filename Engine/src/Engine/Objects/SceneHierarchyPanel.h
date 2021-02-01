@@ -18,7 +18,7 @@ namespace Engine {
 
 		void OnImGuiRender();
 
-		void DrawComponents(Entity& entity);
+		void DrawComponents(Entity entity);
 
 	private:
 		float colorBuffer[3];

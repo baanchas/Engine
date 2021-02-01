@@ -70,10 +70,14 @@ namespace Engine {
 		auto viewCCTC = m_Registry.view<CameraComponent, TransformComponent>();
 		for (auto entity : viewCCTC)
 		{
-			CameraComponent& cc = m_Registry.get<CameraComponent>(entity);
 			TransformComponent& tc = m_Registry.get<TransformComponent>(entity);
-			cc.Camera.SetCenter(tc.Position);
-			cc.Camera.SetRotation(tc.Rotation);
+			if (m_Registry.has<CameraComponent>(entity))
+			{
+				CameraComponent& cc = m_Registry.get<CameraComponent>(entity);
+
+				cc.Camera.SetCenter(tc.Position);
+				cc.Camera.SetRotation(tc.Rotation);
+			}
 		}
 	}
 
@@ -114,5 +118,58 @@ namespace Engine {
 			tag.Tag = name;
 		}
 		return entity;
+	}
+
+	void Scene::DestroyEntity(Entity& entity)
+	{
+		m_Registry.destroy(entity);
+	}
+
+	template<typename T>
+	bool Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		static_assert(false);
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<ColorComponent>(Entity entity, ColorComponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<RectangleCOmponent>(Entity entity, RectangleCOmponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<SpriteComponent>(Entity entity, SpriteComponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+		return true;
+	}
+
+	template<>
+	bool Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		return true;
 	}
 }

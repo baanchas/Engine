@@ -35,15 +35,64 @@ namespace Engine {
 			{
 				m_SelectedEntity = entity;
 			}
-
+			
+			if (ImGui::BeginPopupContextItem(0, 1))
+			{
+				if (ImGui::MenuItem("Delete Entity"))
+				{
+					if (m_SelectedEntity == entity)
+						m_SelectedEntity = {};
+					m_Context->DestroyEntity(entity);
+				}
+				ImGui::EndPopup();
+			}
 		});
+		
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				m_Context->CreateEntity("Empty Entity");
+			}
+
+			ImGui::EndPopup();
+		}
+
+
 		ImGui::End();
 
 		ImGui::Begin("Properties");
 		if (m_SelectedEntity)
 		{
 			DrawComponents(m_SelectedEntity);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("Add Component");
+
+			if (ImGui::BeginPopup("Add Component"))
+			{
+				if (ImGui::MenuItem("Rectangle Component"))
+				{
+					m_SelectedEntity.AddComponent<RectangleCOmponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Color Component"))
+				{
+					m_SelectedEntity.AddComponent<ColorComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Camera Component"))
+				{
+					m_SelectedEntity.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
+
 		ImGui::End();
 	}
 
@@ -98,7 +147,7 @@ namespace Engine {
 		ImGui::PopID();
 	}
 
-	static void DrawFloatControl(const std::string& label, float& value, float resetValue, float columnWidth = 100.f)
+	static void DrawFloatControl(const std::string& label, float& value, float resetValue, float speed, float columnWidth = 100.f)
 	{
 		ImGui::PushID(label.c_str());
 
@@ -117,7 +166,7 @@ namespace Engine {
 			value = resetValue;
 
 		ImGui::SameLine();
-		ImGui::DragFloat("##R", &value, 1.0f);
+		ImGui::DragFloat("##R", &value, speed);
 		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
@@ -129,18 +178,43 @@ namespace Engine {
 
 	// Draw Components
 
-	void SceneHierarchyPanel::DrawComponents(Entity& entity)
+	ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+
+	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)typeid(TagComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Tag"))
+			bool open = ImGui::TreeNodeEx((void*)typeid(TagComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Tag");
+
+			ImGui::SameLine(ImGui::GetWindowWidth() - 20.f);
+			if (ImGui::Button("+", ImVec2(15, 15)))
 			{
+				ImGui::OpenPopup("Component settings");
+			}
+			bool removeComponent = false;
+
+			if (ImGui::BeginPopup("Component settings"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeComponent = true;
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
+			{
+
 				auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 				ImGui::InputText("Tag", (char*)tag.c_str(), tag.capacity() + 1);
 
 				ImGui::TreePop();
 			}
+
+			if (removeComponent)
+				entity.RemoveComponent<TagComponent>();
 		}
 
 		if (entity.HasComponent<TransformComponent>())
@@ -155,16 +229,43 @@ namespace Engine {
 
 				DrawFloat2Control("Position", *pos);
 				DrawFloat2Control("Scale", *scale, 1.0f);
-				DrawFloatControl("Rotation", transform.Rotation, 0.0f);
+				DrawFloatControl("Rotation", transform.Rotation, 0.0f, 1.0f);
+
+
 				ImGui::TreePop();
+
 			}
 		}
 
 		if (entity.HasComponent<ColorComponent>())
 		{
-			if (ImGui::TreeNodeEx((void*)typeid(ColorComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Color Component"))
+			bool open = ImGui::TreeNodeEx((void*)typeid(ColorComponent).hash_code(), treeFlags, "Color Component");
+
+			ImGui::SameLine(ImGui::GetWindowWidth() - 20.f);
+			if (ImGui::Button("+", ImVec2(15, 15)))
+			{
+				ImGui::OpenPopup("Component settings");
+			}
+
+			bool removeComponent = false;
+
+			if (ImGui::BeginPopup("Component settings"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeComponent = true;
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (open)
 			{
 				auto& cc = entity.GetComponent<ColorComponent>();
+
+				colorBuffer[0] = (float)cc.Color.r / (float)255;
+				colorBuffer[1] = (float)cc.Color.g / (float)255;
+				colorBuffer[2] = (float)cc.Color.b / (float)255;
 
 				ImGui::ColorEdit3("Change Color", colorBuffer, ImGuiColorEditFlags_InputRGB);
 
@@ -172,8 +273,15 @@ namespace Engine {
 				cc.Color.g = colorBuffer[1] * 255;
 				cc.Color.b = colorBuffer[2] * 255;
 
+
 				ImGui::TreePop();
 			}
+
+			if (removeComponent)
+			{
+				entity.RemoveComponent<ColorComponent>();
+			}
+			removeComponent = false;
 		}
 
 		if (entity.HasComponent<RectangleCOmponent>())
@@ -185,6 +293,18 @@ namespace Engine {
 				float* size[2] = { &rc.Size.x, &rc.Size.y };
 
 				DrawFloat2Control("Size", *size, 100.f);
+
+				ImGui::TreePop();
+			}
+		}
+
+		if (entity.HasComponent<CameraComponent>())
+		{
+			if (ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera"))
+			{
+				auto& cc = entity.GetComponent<CameraComponent>();
+
+				DrawFloatControl("Rotation", cc.Camera.m_zoomLevel, 1.0f, 0.01f);
 
 				ImGui::TreePop();
 			}

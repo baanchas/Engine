@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Scene.h"
-//#include <functional>
 
 namespace Engine {
 
@@ -17,6 +16,10 @@ namespace Engine {
 		virtual void Render(sf::RenderTarget& rt) {}
 		virtual void Update(float& ts) {}
 
+		bool Valid()
+		{
+			return  m_Scene->m_Registry.valid(m_EntityId);
+		}
 
 		template <typename T, typename... Args>
 		T& AddComponent(Args&&... args)
@@ -41,7 +44,8 @@ namespace Engine {
 		template<typename T>
 		void RemoveComponent()
 		{
-			ENGINE_ASSERT(!HasComponent<T>(), "Entity does not have such component!");
+			if (!HasComponent<T>())
+				ENGINE_ERROR("Entity does not have such component!");
 			m_Scene->m_Registry.remove<T>(m_EntityId);
 		}
 
@@ -50,6 +54,7 @@ namespace Engine {
 		operator uint32_t() const { return (uint32_t)m_EntityId; };
 		operator entt::entity() const { return m_EntityId; };
 
+		entt::entity get() { return m_EntityId; };
 
 		bool operator==(const Entity& other) const
 		{
