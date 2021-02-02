@@ -13,7 +13,8 @@ namespace Engine {
 
 	Scene::~Scene()
 	{
-
+		for (auto entity : m_Entities)
+			delete entity;
 	}
 
 	void Scene::OnUpdate(float& ts)
@@ -103,12 +104,12 @@ namespace Engine {
 		}
 	}
 
-	Entity Scene::CreateEntity(std::string name)
+	Entity* Scene::CreateEntity(std::string name)
 	{
-		Entity entity = { m_Registry.create(), this };
-		entity.AddComponent<TransformComponent>();
-		entity.AddComponent<TagComponent>();
-		auto& tag = entity.GetComponent<TagComponent>();
+		Entity* entity = new Entity(m_Registry.create(), this );
+		entity->AddComponent<TransformComponent>();
+		entity->AddComponent<TagComponent>();
+		auto& tag = entity->GetComponent<TagComponent>();
 		if (name.empty())
 		{
 			tag.Tag = "Entity";
@@ -117,11 +118,16 @@ namespace Engine {
 		{
 			tag.Tag = name;
 		}
+		m_Entities.push_back(entity);
+		std::cout << entity << std::endl;
 		return entity;
 	}
 
-	void Scene::DestroyEntity(Entity& entity)
+	void Scene::DestroyEntity(Entity entity)
 	{
+		//auto it = std::find(m_Entities.begin(), m_Entities.end() - 1, &entity);
+		//std::cout << &entity << std::endl;
+		//m_Entities.erase(it); // TODO : DESTROYS REAL ENTITY IN MEMORY!
 		m_Registry.destroy(entity);
 	}
 

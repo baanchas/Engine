@@ -31,10 +31,11 @@ namespace Engine {
 		void RenderFrameBuffer(sf::RenderTarget& rt);
 
 
+		Entity* PrimaryCamera;// = m_Camera;
+
 	private:
 		sf::RenderTexture* m_RenderTexture;
 		Scene* m_ActiveScene;
-		Entity* PrimaryCamera;// = m_Camera;
 
 		WindowProps props;
 
@@ -43,10 +44,10 @@ namespace Engine {
 		SceneHierarchyPanel m_Panel;
 
 		// TEMP
-		Entity entt;
-		Entity entity;
-		Entity m_Camera;
-		Entity m_SecondCamera;
+		Entity* entt;
+		Entity* entity;
+		Entity* m_Camera;
+		Entity* m_SecondCamera;
 
 		sf::Sprite sprites[4];
 		sf::Texture texture1;

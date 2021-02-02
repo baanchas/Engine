@@ -15,34 +15,34 @@ namespace Engine {
 		
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 
+		// TEMP
 		entt = m_ActiveScene->CreateEntity("Cube 1");
 		entity = m_ActiveScene->CreateEntity("Cube 2");
 		m_Camera = m_ActiveScene->CreateEntity("Camera 1");
 		m_SecondCamera = m_ActiveScene->CreateEntity("Camera 2");
 
 
-		m_Camera.AddComponent<CameraComponent>();
+		m_Camera->AddComponent<CameraComponent>();
+
+		m_SecondCamera->AddComponent<CameraComponent>();
 		
-		m_SecondCamera.AddComponent<CameraComponent>();
-		
-		PrimaryCamera = &m_Camera;
+		PrimaryCamera = m_Camera;
 		
 		// Setup enttities
-		entity.AddComponent<RectangleCOmponent>(sf::Vector2f(100, 100));
-		auto& rc1 = entity.GetComponent<RectangleCOmponent>();
+		entity->AddComponent<RectangleCOmponent>(sf::Vector2f(100, 100));
+		auto& rc1 = entity->GetComponent<RectangleCOmponent>();
 		rc1.SetOrigin();
-		auto& tc1 = entity.GetComponent<TransformComponent>();
+		auto& tc1 = entity->GetComponent<TransformComponent>();
 		tc1.Position = sf::Vector2f(1000, 200);
-		entity.AddComponent<ColorComponent>();
+		entity->AddComponent<ColorComponent>();
 
-		entt.AddComponent<RectangleCOmponent>(sf::Vector2f(200, 200));
-		auto& rc = entt.GetComponent<RectangleCOmponent>();
+		entt->AddComponent<RectangleCOmponent>(sf::Vector2f(200, 200));
+		auto& rc = entt->GetComponent<RectangleCOmponent>();
 		rc.SetOrigin();
-		auto& tc = entt.GetComponent<TransformComponent>();
+		auto& tc = entt->GetComponent<TransformComponent>();
 		tc.Position = sf::Vector2f(400, 400);
-		entt.AddComponent<ColorComponent>();
+		entt->AddComponent<ColorComponent>();
 
-		// TEMP
 		texture1.loadFromFile("resources/sprites/checkerboard.png");
 		for (int i = 0; i < 4; i++)
 		{
@@ -113,15 +113,29 @@ namespace Engine {
 
 	void EditorLayer::OnUpdate(float& ts)
 	{
+		if (!PrimaryCamera->Valid())
+		{
+			for (auto entity : m_ActiveScene->m_Entities)
+			{
+				if (entity->Valid())
+				{
+					if (entity->HasComponent<CameraComponent>())
+					{
+						PrimaryCamera = entity;
+					}
+				}
+			}
+		}
+
 		if (camera1)
 		{
-			if (m_SecondCamera.Valid())
-				PrimaryCamera = &m_SecondCamera;
+			if (m_SecondCamera->Valid())
+				PrimaryCamera = m_SecondCamera;
 		}
 		else
 		{
-			if (m_Camera.Valid())
-				PrimaryCamera = &m_Camera;
+			if (m_Camera->Valid())
+				PrimaryCamera = m_Camera;
 		}
 		
 		// Updating Scene stuff only when cnene window is active
@@ -141,18 +155,18 @@ namespace Engine {
 			}
 		}
 
-		if (entt.Valid())
+		if (entt->Valid())
 		{
-			auto& rc = entt.GetComponent<TransformComponent>();
+			auto& rc = entt->GetComponent<TransformComponent>();
 			rc.Rotation += 40 * ts;
 		}
 		//rc.rect.setRotation(40 * ts);
 
-		if (m_SceneIsFocused && entt.Valid())
+		if (m_SceneIsFocused && entt->Valid())
 		{
-			if (entt.HasComponent<TransformComponent>())
+			if (entt->HasComponent<TransformComponent>())
 			{
-				auto& tc = entt.GetComponent<TransformComponent>();
+				auto& tc = entt->GetComponent<TransformComponent>();
 				if (Input::IsKeyPressed(KeyCodes::Keyboard::A))
 				{
 					tc.Position += sf::Vector2f(100, 0) * -ts;
